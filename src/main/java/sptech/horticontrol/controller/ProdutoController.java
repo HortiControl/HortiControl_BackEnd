@@ -39,4 +39,14 @@ public class ProdutoController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity atualizar(@PathVariable("id") int id, @RequestBody Produto produto) {
+        if (repository.existsById(id)) {
+            produto.setId(id);
+            repository.save(produto);
+            return ResponseEntity.ok(produto);
+        }
+        return ResponseEntity.notFound().build();
+    }
 }
