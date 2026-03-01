@@ -58,7 +58,7 @@ O HortiControl é um sistema web interno desenvolvido como projeto acadêmico pa
 git clone https://github.com/HortiControl/HortiControl_BackEnd.git
 
 # Entre na pasta
-cd horticontrol
+cd HortiControl_BackEnd
 
 # Suba a aplicação
 ./mvnw spring-boot:run
