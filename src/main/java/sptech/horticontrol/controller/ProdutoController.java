@@ -43,7 +43,7 @@ public class ProdutoController {
     @PutMapping("/{id}")
     public ResponseEntity atualizar(@PathVariable("id") int id, @RequestBody Produto produto) {
         if (repository.existsById(id)) {
-            produto.setId(id);
+            produto.setIdProduto((long) id);
             repository.save(produto);
             return ResponseEntity.ok(produto);
         }

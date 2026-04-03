@@ -9,31 +9,38 @@ import java.math.BigDecimal;
 public class Produto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+    @Column(name = "idProduto")
+    private Long idProduto;
 
-    @Column(name = "nome", length = 100)
+    @Column(name = "nome", length = 45, nullable = false)
     private String nome;
 
-    @Column(name = "tipo", length = 50)
-    private String tipo;
-
-    @Column(name = "preco", precision = 10, scale = 2)
+    @Column(name = "preco", precision = 10, scale = 2, nullable = false)
     private BigDecimal preco;
 
-    @Column(name = "embalagem", length = 50)
+    @Column(name = "embalagem", length = 45, nullable = false)
     private String embalagem;
 
-    @Column(name = "tipo_unidade", length = 30)
-    private String tipoUnidade;
+    @Column(name = "fkUsuario", nullable = true)
+    private Long fkUsuario;
 
-
-    public Integer getId() {
-        return id;
+    public Produto() {
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public Produto(String nome, Long idProduto, BigDecimal preco, String embalagem, Long fkUsuario) {
+        this.nome = nome;
+        this.idProduto = idProduto;
+        this.preco = preco;
+        this.embalagem = embalagem;
+        this.fkUsuario = fkUsuario;
+    }
+
+    public Long getIdProduto() {
+        return idProduto;
+    }
+
+    public void setIdProduto(Long idProduto) {
+        this.idProduto = idProduto;
     }
 
     public String getNome() {
@@ -42,14 +49,6 @@ public class Produto {
 
     public void setNome(String nome) {
         this.nome = nome;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
     }
 
     public BigDecimal getPreco() {
@@ -68,11 +67,11 @@ public class Produto {
         this.embalagem = embalagem;
     }
 
-    public String getTipoUnidade() {
-        return tipoUnidade;
+    public Long getFkUsuario() {
+        return fkUsuario;
     }
 
-    public void setTipoUnidade(String tipoUnidade) {
-        this.tipoUnidade = tipoUnidade;
+    public void setFkUsuario(Long fkUsuario) {
+        this.fkUsuario = fkUsuario;
     }
 }
