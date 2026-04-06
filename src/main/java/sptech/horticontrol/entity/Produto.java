@@ -21,18 +21,14 @@ public class Produto {
     @Column(name = "embalagem", length = 45, nullable = false)
     private String embalagem;
 
-    @Column(name = "fkUsuario", nullable = true)
-    private Long fkUsuario;
-
     public Produto() {
     }
 
-    public Produto(String nome, Long idProduto, BigDecimal preco, String embalagem, Long fkUsuario) {
+    public Produto(String nome, Long idProduto, BigDecimal preco, String embalagem) {
         this.nome = nome;
         this.idProduto = idProduto;
         this.preco = preco;
         this.embalagem = embalagem;
-        this.fkUsuario = fkUsuario;
     }
 
     public Long getIdProduto() {
@@ -67,11 +63,4 @@ public class Produto {
         this.embalagem = embalagem;
     }
 
-    public Long getFkUsuario() {
-        return fkUsuario;
-    }
-
-    public void setFkUsuario(Long fkUsuario) {
-        this.fkUsuario = fkUsuario;
-    }
 }
