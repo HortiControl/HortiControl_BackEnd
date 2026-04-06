@@ -1,16 +1,18 @@
 package sptech.horticontrol.entity;
 
 import jakarta.persistence.*;
+import sptech.horticontrol.enumerators.TipoEmbalagem;
 
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "produto")
 public class Produto {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idProduto")
-    private Long idProduto;
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "nome", length = 45, nullable = false)
     private String nome;
@@ -19,24 +21,24 @@ public class Produto {
     private BigDecimal preco;
 
     @Column(name = "embalagem", length = 45, nullable = false)
-    private String embalagem;
+    private TipoEmbalagem tipoEmbalagem;
 
     public Produto() {
     }
 
-    public Produto(String nome, Long idProduto, BigDecimal preco, String embalagem) {
+    public Produto(String nome, Long id, BigDecimal preco, TipoEmbalagem tipoEmbalagem) {
         this.nome = nome;
-        this.idProduto = idProduto;
+        this.id = id;
         this.preco = preco;
-        this.embalagem = embalagem;
+        this.tipoEmbalagem = tipoEmbalagem;
     }
 
-    public Long getIdProduto() {
-        return idProduto;
+    public Long getId() {
+        return id;
     }
 
-    public void setIdProduto(Long idProduto) {
-        this.idProduto = idProduto;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getNome() {
@@ -55,12 +57,11 @@ public class Produto {
         this.preco = preco;
     }
 
-    public String getEmbalagem() {
-        return embalagem;
+    public TipoEmbalagem getTipoEmbalagem() {
+        return tipoEmbalagem;
     }
 
-    public void setEmbalagem(String embalagem) {
-        this.embalagem = embalagem;
+    public void setTipoEmbalagem(TipoEmbalagem tipoEmbalagem) {
+        this.tipoEmbalagem = tipoEmbalagem;
     }
-
 }
