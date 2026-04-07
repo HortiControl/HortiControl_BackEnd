@@ -3,18 +3,19 @@ package sptech.horticontrol.dtos.response;
 import sptech.horticontrol.enums.TipoMercado;
 
 public class MercadoResponseDTO {
-
     private Long id;
     private String nome;
-    private TipoMercado tipoMercado;
+    private TipoMercado tipo;
+    private String observacao;
 
     public MercadoResponseDTO() {
     }
 
-    public MercadoResponseDTO(Long id, String nome, TipoMercado tipoMercado) {
+    public MercadoResponseDTO(Long id, String nome, TipoMercado tipo, String observacao) {
         this.id = id;
         this.nome = nome;
-        this.tipoMercado = tipoMercado;
+        this.tipo = tipo;
+        this.observacao = observacao;
     }
 
     public Long getId() {
@@ -33,11 +34,19 @@ public class MercadoResponseDTO {
         this.nome = nome;
     }
 
-    public TipoMercado getTipoMercado() {
-        return tipoMercado;
+    public TipoMercado getTipo() {
+        return tipo;
     }
 
-    public void setTipoMercado(TipoMercado tipoMercado) {
-        this.tipoMercado = tipoMercado;
+    public void setTipo(TipoMercado tipo) {
+        this.tipo = tipo;
+    }
+
+    public String getObservacao() {
+        return observacao;
+    }
+
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
     }
 }

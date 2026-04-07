@@ -37,12 +37,13 @@ public class Pedido {
     public Pedido() {
     }
 
-    public Pedido(Long id, LocalDate dataSolicitacao, BigDecimal valorTotal, StatusPedido statusPedido, Mercado mercado) {
+    public Pedido(Long id, LocalDate dataSolicitacao, BigDecimal valorTotal, StatusPedido statusPedido, Mercado mercado, List<ItemPedido> itens) {
         this.id = id;
         this.dataSolicitacao = dataSolicitacao;
         this.valorTotal = valorTotal;
         this.statusPedido = statusPedido;
         this.mercado = mercado;
+        this.itens = itens;
     }
 
     public Long getId() {
@@ -85,4 +86,11 @@ public class Pedido {
         this.mercado = mercado;
     }
 
+    public List<ItemPedido> getItens() {
+        return itens;
+    }
+
+    public void setItens(List<ItemPedido> itens) {
+        this.itens = itens;
+    }
 }
