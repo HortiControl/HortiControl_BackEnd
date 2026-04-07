@@ -1,7 +1,7 @@
 package sptech.horticontrol.entity;
 
 import jakarta.persistence.*;
-import sptech.horticontrol.enumerators.TipoMercado;
+import sptech.horticontrol.enums.TipoMercado;
 
 @Entity
 @Table(name = "mercado")
@@ -15,7 +15,8 @@ public class Mercado {
     @Column(name = "nome", length = 50, nullable = false)
     private String nome;
 
-    @Column(name = "tipo_embalagem", length = 20, nullable = false)
+    @Column(name = "tipo_mercado", length = 20, nullable = false)
+    @Enumerated(EnumType.STRING)
     private TipoMercado tipoMercado;
 
     @Column(name = "observacao", length = 255, nullable = false)

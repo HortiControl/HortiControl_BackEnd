@@ -1,10 +1,12 @@
 package sptech.horticontrol.entity;
 
 import jakarta.persistence.*;
-import sptech.horticontrol.enumerators.StatusPedido;
+import sptech.horticontrol.enums.StatusPedido;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "pedido")
@@ -18,15 +20,19 @@ public class Pedido {
     @Column(name = "data_solicitacao", length = 10, nullable = false)
     private LocalDate dataSolicitacao;
 
-    @Column(name = "valor_total", length = 50, nullable = false)
+    @Column(name = "valor_total", precision = 10, scale = 2, nullable = false)
     private BigDecimal valorTotal;
 
     @Column(name = "status_pedido", length = 15, nullable = false)
+    @Enumerated(EnumType.STRING)
     private StatusPedido statusPedido;
 
     @ManyToOne
     @JoinColumn(name = "mercado_id")
     private Mercado mercado;
+
+    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItemPedido> itens = new ArrayList<>();
 
     public Pedido() {
     }

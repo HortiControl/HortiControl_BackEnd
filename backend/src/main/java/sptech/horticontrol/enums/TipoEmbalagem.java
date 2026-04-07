@@ -1,4 +1,4 @@
-package sptech.horticontrol.enumerators;
+package sptech.horticontrol.enums;
 
 public enum TipoEmbalagem {
 

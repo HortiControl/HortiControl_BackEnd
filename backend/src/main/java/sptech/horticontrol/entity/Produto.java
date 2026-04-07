@@ -1,7 +1,7 @@
 package sptech.horticontrol.entity;
 
 import jakarta.persistence.*;
-import sptech.horticontrol.enumerators.TipoEmbalagem;
+import sptech.horticontrol.enums.TipoEmbalagem;
 
 import java.math.BigDecimal;
 
@@ -21,6 +21,7 @@ public class Produto {
     private BigDecimal preco;
 
     @Column(name = "embalagem", length = 45, nullable = false)
+    @Enumerated(EnumType.STRING)
     private TipoEmbalagem tipoEmbalagem;
 
     public Produto() {
