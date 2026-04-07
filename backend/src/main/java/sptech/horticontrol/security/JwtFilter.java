@@ -35,9 +35,10 @@ public class JwtFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String path = request.getServletPath();
+        String method = request.getMethod(); // 🔥 Pega o método (GET, POST, etc)
 
-        // 🔥 IGNORA LOGIN E CADASTRO
-        if (path.equals("/usuarios/login") || path.equals("/usuarios")) {
+// Ignora se for o Login, OU se for um POST para criar usuário
+        if (path.equals("/usuarios/login") || (path.equals("/usuarios") && method.equals("POST"))) {
             filterChain.doFilter(request, response);
             return;
         }

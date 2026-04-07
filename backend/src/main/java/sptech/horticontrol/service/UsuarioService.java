@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import sptech.horticontrol.entity.Usuario;
 import sptech.horticontrol.repository.UsuarioRepository;
 
+import java.util.List;
+
 @Service
 public class UsuarioService {
 
@@ -24,5 +26,9 @@ public class UsuarioService {
     public Usuario cadastrar(Usuario usuario) {
         usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
         return usuarioRepository.save(usuario);
+    }
+
+    public List<Usuario> listarUsuarios(){
+        return usuarioRepository.findAll();
     }
 }

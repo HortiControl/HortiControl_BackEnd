@@ -10,6 +10,8 @@ import sptech.horticontrol.entity.Usuario;
 import sptech.horticontrol.security.JwtService;
 import sptech.horticontrol.service.UsuarioService;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
@@ -56,5 +58,10 @@ public class UsuarioController {
         // Se chegou aqui, as credenciais são válidas — gera e retorna o token
         String token = jwtService.gerarToken(loginDto.email());
         return ResponseEntity.ok(token);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Usuario>> listarUsuarios(){
+        return ResponseEntity.status(200).body(usuarioService.listarUsuarios());
     }
 }
