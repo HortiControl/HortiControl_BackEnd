@@ -76,6 +76,10 @@ public class ProdutoService {
 
         List<Produto> todosProdutos = produtoRepository.findAll();
 
+        if (novoPreco.compareTo(BigDecimal.ZERO) < 0) {
+            throw new RuntimeException("O preço não pode ser negativo");
+        }
+
         for (Produto produto : todosProdutos) {
             produto.setPreco(novoPreco);
         }

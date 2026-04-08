@@ -7,6 +7,7 @@ import sptech.horticontrol.dtos.request.ProdutoRequestDTO;
 import sptech.horticontrol.dtos.response.ProdutoResponseDTO;
 import sptech.horticontrol.service.ProdutoService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -36,6 +37,41 @@ public class ProdutoController {
 
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<ProdutoResponseDTO> atualizar (@PathVariable Long id, @RequestBody ProdutoRequestDTO dto) {
 
+        return ResponseEntity.ok(produtoService.atualizarProduto(id, dto));
+
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir (@PathVariable Long id) {
+
+        produtoService.excluirProduto(id);
+        return ResponseEntity.status(204).build();
+
+    }
+
+    @GetMapping("/produtos/{nome}")
+    public ResponseEntity<List<ProdutoResponseDTO>> buscarPorNome (@RequestParam String nome) {
+
+        List<ProdutoResponseDTO> listaProdutos = produtoService.buscarProdutoPorNome(nome);
+
+        if (listaProdutos.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        }
+
+        return ResponseEntity.ok(listaProdutos);
+
+    }
+
+    @PatchMapping("/reajuste-global")
+    public ResponseEntity<Void> reajustarPrecoGlobal(@RequestParam BigDecimal novoPreco) {
+
+        produtoService.reajustarPrecoGlobal(novoPreco);
+
+        return ResponseEntity.status(204).build();
+
+    }
 
 }
