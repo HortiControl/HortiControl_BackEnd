@@ -42,7 +42,7 @@ public class ProdutoService {
     public ProdutoResponseDTO atualizarProduto (Long id, ProdutoRequestDTO dto) {
 
         Produto produtoExistente = produtoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Mercado não encontrado"));
+                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
 
         produtoExistente.setNome(dto.getNome());
         produtoExistente.setPreco(dto.getPreco());

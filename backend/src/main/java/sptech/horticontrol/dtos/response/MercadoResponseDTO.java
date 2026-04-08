@@ -5,7 +5,7 @@ import sptech.horticontrol.enums.TipoMercado;
 public class MercadoResponseDTO {
     private Long id;
     private String nome;
-    private TipoMercado tipo;
+    private TipoMercado tipoMercado;
     private String observacao;
 
     public MercadoResponseDTO() {
@@ -14,7 +14,7 @@ public class MercadoResponseDTO {
     public MercadoResponseDTO(Long id, String nome, TipoMercado tipo, String observacao) {
         this.id = id;
         this.nome = nome;
-        this.tipo = tipo;
+        this.tipoMercado = tipo;
         this.observacao = observacao;
     }
 
@@ -34,12 +34,12 @@ public class MercadoResponseDTO {
         this.nome = nome;
     }
 
-    public TipoMercado getTipo() {
-        return tipo;
+    public TipoMercado getTipoMercado() {
+        return tipoMercado;
     }
 
-    public void setTipo(TipoMercado tipo) {
-        this.tipo = tipo;
+    public void setTipoMercado(TipoMercado tipoMercado) {
+        this.tipoMercado = tipoMercado;
     }
 
     public String getObservacao() {
