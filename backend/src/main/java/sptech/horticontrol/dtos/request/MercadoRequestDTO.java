@@ -1,11 +1,24 @@
 package sptech.horticontrol.dtos.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import sptech.horticontrol.enums.TipoMercado;
 
 public class MercadoRequestDTO {
 
+    @Schema(
+            description = "Nome do mercado",
+            example = "Mercado Central"
+    )
     private String nome;
+    @Schema(
+            description = "Tipo do mercado",
+            example = "SUPERMERCADO"
+    )
     private TipoMercado tipoMercado;
+    @Schema(
+            description = "Observações adicionais",
+            example = "Atendimento 24 horas"
+    )
     private String observacao;
 
     public MercadoRequestDTO() {

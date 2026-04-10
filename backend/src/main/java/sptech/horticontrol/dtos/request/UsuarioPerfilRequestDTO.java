@@ -1,9 +1,16 @@
 package sptech.horticontrol.dtos.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 public class UsuarioPerfilRequestDTO {
 
+    @Schema(example = "Maria Silva", description = "Nome do usuário")
     private String nome;
+
+    @Schema(example = "maria@email.com", description = "Email do usuário")
     private String email;
+
+    @Schema(example = "11999998888", description = "Telefone do usuário")
     private String telefone;
 
     public UsuarioPerfilRequestDTO() {

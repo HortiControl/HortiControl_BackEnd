@@ -1,10 +1,19 @@
 package sptech.horticontrol.dtos.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 public class UsuarioResponseDTO {
 
+    @Schema(example = "1")
     private Long id;
+
+    @Schema(example = "Maria Silva")
     private String nome;
+
+    @Schema(example = "maria@email.com")
     private String email;
+
+    @Schema(example = "11999998888")
     private String telefone;
 
     public UsuarioResponseDTO() {

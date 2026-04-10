@@ -1,14 +1,22 @@
 package sptech.horticontrol.dtos.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import sptech.horticontrol.enums.TipoEmbalagem;
 
 import java.math.BigDecimal;
 
 public class ProdutoResponseDTO {
 
+    @Schema(description = "ID do produto", example = "1")
     private Long id;
+
+    @Schema(description = "Nome do produto", example = "Alface Crespa")
     private String nome;
+
+    @Schema(description = "Preço do produto", example = "9.99")
     private BigDecimal preco;
+
+    @Schema(description = "Tipo de embalagem", example = "BANDEJA")
     private TipoEmbalagem tipoEmbalagem;
 
     public ProdutoResponseDTO() {

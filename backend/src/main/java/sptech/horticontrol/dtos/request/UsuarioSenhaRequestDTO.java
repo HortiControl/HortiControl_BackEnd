@@ -1,8 +1,19 @@
 package sptech.horticontrol.dtos.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 public class UsuarioSenhaRequestDTO {
 
+    @Schema(
+            description = "Senha atual do usuário",
+            example = "Senha@123"
+    )
     private String senhaAtual;
+
+    @Schema(
+            description = "Nova senha",
+            example = "NovaSenha@123"
+    )
     private String novaSenha;
 
     public UsuarioSenhaRequestDTO() {

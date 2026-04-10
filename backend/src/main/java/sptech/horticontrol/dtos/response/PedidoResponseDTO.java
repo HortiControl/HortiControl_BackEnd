@@ -1,5 +1,6 @@
 package sptech.horticontrol.dtos.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import sptech.horticontrol.enums.StatusPedido;
 
 import java.math.BigDecimal;
@@ -8,11 +9,22 @@ import java.util.List;
 
 public class PedidoResponseDTO {
 
+    @Schema(description = "ID do pedido", example = "10")
     private Long id;
+
+    @Schema(description = "Data da solicitação", example = "2026-04-10")
     private LocalDate dataSolicitacao;
+
+    @Schema(description = "Valor total do pedido", example = "249.90")
     private BigDecimal valorTotal;
+
+    @Schema(description = "Status atual do pedido", example = "EM_ANDAMENTO")
     private StatusPedido statusPedido;
+
+    @Schema(description = "Mercado associado ao pedido")
     private MercadoResponseDTO mercado;
+
+    @Schema(description = "Itens do pedido")
     private List<ItemPedidoResponseDTO> itens;
 
     public PedidoResponseDTO() {
