@@ -1,28 +1,12 @@
-package sptech.horticontrol.dtos.response;
+package sptech.horticontrol.dtos.request;
 
-public class UsuarioResponseDTO {
+public class UsuarioPerfilRequestDTO {
 
-    private Long id;
     private String nome;
     private String email;
     private String telefone;
 
-    public UsuarioResponseDTO() {
-    }
-
-    public UsuarioResponseDTO(Long id, String nome, String email, String telefone) {
-        this.id = id;
-        this.nome = nome;
-        this.email = email;
-        this.telefone = telefone;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    public UsuarioPerfilRequestDTO() {
     }
 
     public String getNome() {

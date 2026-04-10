@@ -6,6 +6,9 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import sptech.horticontrol.dtos.LoginDto;
+import sptech.horticontrol.dtos.request.UsuarioPerfilRequestDTO;
+import sptech.horticontrol.dtos.request.UsuarioSenhaRequestDTO;
+import sptech.horticontrol.dtos.response.UsuarioResponseDTO;
 import sptech.horticontrol.entity.Usuario;
 import sptech.horticontrol.security.JwtService;
 import sptech.horticontrol.service.UsuarioService;
@@ -64,4 +67,20 @@ public class UsuarioController {
     public ResponseEntity<List<Usuario>> listarUsuarios(){
         return ResponseEntity.status(200).body(usuarioService.listarUsuarios());
     }
+
+    @PutMapping("/perfil/{id}")
+    public ResponseEntity<UsuarioResponseDTO> atualizarPerfil(@PathVariable Long id, @RequestBody UsuarioPerfilRequestDTO dto) {
+
+        return ResponseEntity.ok(usuarioService.atualizarPerfil(id, dto));
+
+    }
+
+    @PatchMapping("/senha/{id}")
+    public ResponseEntity<Void> atualizarSenha(@PathVariable Long id, @RequestBody UsuarioSenhaRequestDTO dto) {
+
+        usuarioService.atualizarSenha(id, dto);
+        return ResponseEntity.status(204).build();
+
+    }
+
 }
