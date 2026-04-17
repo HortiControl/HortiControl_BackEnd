@@ -2,6 +2,7 @@ package sptech.horticontrol.dtos.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import sptech.horticontrol.enums.TipoEmbalagem;
+import sptech.horticontrol.enums.TipoProduto;
 
 import java.math.BigDecimal;
 
@@ -19,14 +20,18 @@ public class ProdutoResponseDTO {
     @Schema(description = "Tipo de embalagem", example = "BANDEJA")
     private TipoEmbalagem tipoEmbalagem;
 
+    @Schema(description = "Tipo de Produto", example = "NAO_LAVADO")
+    private TipoProduto tipoProduto;
+
     public ProdutoResponseDTO() {
     }
 
-    public ProdutoResponseDTO(Long id, String nome, BigDecimal preco, TipoEmbalagem tipoEmbalagem) {
+    public ProdutoResponseDTO(Long id, String nome, BigDecimal preco, TipoEmbalagem tipoEmbalagem, TipoProduto tipoProduto) {
         this.id = id;
         this.nome = nome;
         this.preco = preco;
         this.tipoEmbalagem = tipoEmbalagem;
+        this.tipoProduto = tipoProduto;
     }
 
     public Long getId() {
@@ -59,5 +64,13 @@ public class ProdutoResponseDTO {
 
     public void setTipoEmbalagem(TipoEmbalagem tipoEmbalagem) {
         this.tipoEmbalagem = tipoEmbalagem;
+    }
+
+    public TipoProduto getTipoProduto() {
+        return tipoProduto;
+    }
+
+    public void setTipoProduto(TipoProduto tipoProduto) {
+        this.tipoProduto = tipoProduto;
     }
 }

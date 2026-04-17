@@ -2,6 +2,7 @@ package sptech.horticontrol.entity;
 
 import jakarta.persistence.*;
 import sptech.horticontrol.enums.TipoEmbalagem;
+import sptech.horticontrol.enums.TipoProduto;
 
 import java.math.BigDecimal;
 
@@ -24,14 +25,19 @@ public class Produto {
     @Enumerated(EnumType.STRING)
     private TipoEmbalagem tipoEmbalagem;
 
+    @Column(name = "tipo_produto", length = 45, nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TipoProduto tipoProduto;
+
     public Produto() {
     }
 
-    public Produto(Long id, String nome, BigDecimal preco, TipoEmbalagem tipoEmbalagem) {
+    public Produto(Long id, String nome, BigDecimal preco, TipoEmbalagem tipoEmbalagem, TipoProduto tipoProduto) {
         this.id = id;
         this.nome = nome;
         this.preco = preco;
         this.tipoEmbalagem = tipoEmbalagem;
+        this.tipoProduto = tipoProduto;
     }
 
     public Long getId() {
@@ -64,5 +70,13 @@ public class Produto {
 
     public void setTipoEmbalagem(TipoEmbalagem tipoEmbalagem) {
         this.tipoEmbalagem = tipoEmbalagem;
+    }
+
+    public TipoProduto getTipoProduto() {
+        return tipoProduto;
+    }
+
+    public void setTipoProduto(TipoProduto tipoProduto) {
+        this.tipoProduto = tipoProduto;
     }
 }

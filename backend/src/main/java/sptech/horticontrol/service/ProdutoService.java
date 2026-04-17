@@ -3,10 +3,9 @@ package sptech.horticontrol.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sptech.horticontrol.dtos.request.ProdutoRequestDTO;
-import sptech.horticontrol.dtos.response.MercadoResponseDTO;
 import sptech.horticontrol.dtos.response.ProdutoResponseDTO;
-import sptech.horticontrol.entity.Mercado;
 import sptech.horticontrol.entity.Produto;
+import sptech.horticontrol.enums.TipoProduto;
 import sptech.horticontrol.repository.ProdutoRepository;
 
 import java.math.BigDecimal;
@@ -25,6 +24,7 @@ public class ProdutoService {
         novoProduto.setNome(dto.getNome());
         novoProduto.setPreco(dto.getPreco());
         novoProduto.setTipoEmbalagem(dto.getTipoEmbalagem());
+        novoProduto.setTipoProduto(dto.getTipoProduto());
 
         Produto salvo = produtoRepository.save(novoProduto);
         return converterParaResponse(salvo);
@@ -47,6 +47,7 @@ public class ProdutoService {
         produtoExistente.setNome(dto.getNome());
         produtoExistente.setPreco(dto.getPreco());
         produtoExistente.setTipoEmbalagem(dto.getTipoEmbalagem());
+        produtoExistente.setTipoProduto(dto.getTipoProduto());
 
         Produto produtoAtualizado = produtoRepository.save(produtoExistente);
         return converterParaResponse(produtoAtualizado);
@@ -67,29 +68,29 @@ public class ProdutoService {
 
         return produtoRepository.findByNomeContainingIgnoreCase(nome)
                 .stream()
-                .map(p -> new ProdutoResponseDTO(p.getId(), p.getNome(), p.getPreco(), p.getTipoEmbalagem()))
+                .map(p -> new ProdutoResponseDTO(p.getId(), p.getNome(), p.getPreco(), p.getTipoEmbalagem(), p.getTipoProduto()))
                 .collect(Collectors.toList());
 
     }
 
     public void reajustarPrecoGlobal (BigDecimal novoPreco) {
 
-        List<Produto> todosProdutos = produtoRepository.findAll();
-
         if (novoPreco.compareTo(BigDecimal.ZERO) < 0) {
             throw new RuntimeException("O preço não pode ser negativo");
         }
 
-        for (Produto produto : todosProdutos) {
+        List<Produto> produtosPreLavados = produtoRepository.findByTipoProduto(TipoProduto.PRE_LAVADO);
+
+        for (Produto produto : produtosPreLavados) {
             produto.setPreco(novoPreco);
         }
 
-        produtoRepository.saveAll(todosProdutos);
+        produtoRepository.saveAll(produtosPreLavados);
 
     }
 
     private ProdutoResponseDTO converterParaResponse(Produto p) {
-        return new ProdutoResponseDTO(p.getId(), p.getNome(), p.getPreco(), p.getTipoEmbalagem());
+        return new ProdutoResponseDTO(p.getId(), p.getNome(), p.getPreco(), p.getTipoEmbalagem(), p.getTipoProduto());
     }
 
 }

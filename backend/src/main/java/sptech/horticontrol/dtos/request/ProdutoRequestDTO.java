@@ -2,6 +2,7 @@ package sptech.horticontrol.dtos.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import sptech.horticontrol.enums.TipoEmbalagem;
+import sptech.horticontrol.enums.TipoProduto;
 
 import java.math.BigDecimal;
 
@@ -29,6 +30,13 @@ public class ProdutoRequestDTO {
     )
     private TipoEmbalagem tipoEmbalagem;
 
+    @Schema(
+            description = "Tipo de produto",
+            example = "NAO_LAVADO",
+            required = true
+    )
+    private TipoProduto tipoProduto;
+
     public ProdutoRequestDTO() {
     }
 
@@ -54,5 +62,13 @@ public class ProdutoRequestDTO {
 
     public void setTipoEmbalagem(TipoEmbalagem tipoEmbalagem) {
         this.tipoEmbalagem = tipoEmbalagem;
+    }
+
+    public TipoProduto getTipoProduto() {
+        return tipoProduto;
+    }
+
+    public void setTipoProduto(TipoProduto tipoProduto) {
+        this.tipoProduto = tipoProduto;
     }
 }
