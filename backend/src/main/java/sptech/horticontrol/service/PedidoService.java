@@ -99,6 +99,25 @@ public class PedidoService {
 
     }
 
+    public void registrarPagamento(Long id, BigDecimal valorPagamento) {
+
+        Pedido pedido = pedidoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+
+        if (valorPagamento.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("O valor do pagamento deve ser maior que zero.");
+        }
+
+        BigDecimal novoValorPago = pedido.getValorPago().add(valorPagamento);
+
+        if (novoValorPago.compareTo(pedido.getValorTotal()) > 0) {
+            throw new RuntimeException("O valor pago não pode ultrapassar o valor total do pedido.");
+        }
+
+        pedido.setValorPago(novoValorPago);
+        pedidoRepository.save(pedido);
+    }
+
     private List<ItemPedido> processarItens(List<ItemPedidoRequestDTO> itensDto, Pedido pedido) {
         List<ItemPedido> entidades = new ArrayList<>();
 
@@ -125,6 +144,8 @@ public class PedidoService {
 
     private PedidoResponseDTO converterParaResponse(Pedido p) {
 
+        BigDecimal valorAPagar = p.getValorTotal().subtract(p.getValorPago());
+
         MercadoResponseDTO converterMercado = new MercadoResponseDTO(
                 p.getMercado().getId(), p.getMercado().getNome(),
                 p.getMercado().getTipoMercado(), p.getMercado().getObservacao()
@@ -138,7 +159,7 @@ public class PedidoService {
 
         return new PedidoResponseDTO(
                 p.getId(), p.getDataSolicitacao(), p.getValorTotal(),
-                p.getStatusPedido(), converterMercado, converterItens
+                p.getStatusPedido(), p.getValorPago(), valorAPagar,  converterMercado, converterItens
         );
     }
 }

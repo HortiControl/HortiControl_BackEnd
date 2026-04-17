@@ -15,6 +15,7 @@ import sptech.horticontrol.dtos.response.PedidoResponseDTO;
 import sptech.horticontrol.enums.StatusPedido;
 import sptech.horticontrol.service.PedidoService;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -90,11 +91,27 @@ public class PedidoController {
             @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
     })
     @PatchMapping("/{id}/status")
-    public ResponseEntity<Void> atualizarStatus(
-            @PathVariable Long id,
-            @RequestParam StatusPedido novoStatus) {
+    public ResponseEntity<Void> atualizarStatus(@PathVariable Long id, @RequestParam StatusPedido novoStatus) {
 
         pedidoService.atualizarStatusPedido(id, novoStatus);
         return ResponseEntity.status(204).build();
     }
+
+    @Operation(
+            summary = "Atualizar pagamento do cliente",
+            description = "Atualiza o valor referente a quanto o cliente já pagou do pedido"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Valor atualizado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
+    })
+    @PatchMapping("/{id}/pagamento")
+    public ResponseEntity<Void> atualizarPagamento(@PathVariable Long id, @RequestParam BigDecimal valor) {
+
+        pedidoService.registrarPagamento(id, valor);
+
+        return ResponseEntity.status(204).build();
+
+    }
+
 }

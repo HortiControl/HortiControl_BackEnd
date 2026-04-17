@@ -27,6 +27,9 @@ public class Pedido {
     @Enumerated(EnumType.STRING)
     private StatusPedido statusPedido;
 
+    @Column(name = "valor_pago", precision = 10, scale = 2, nullable = false)
+    private BigDecimal valorPago = BigDecimal.ZERO;
+
     @ManyToOne
     @JoinColumn(name = "mercado_id")
     private Mercado mercado;
@@ -37,11 +40,12 @@ public class Pedido {
     public Pedido() {
     }
 
-    public Pedido(Long id, LocalDate dataSolicitacao, BigDecimal valorTotal, StatusPedido statusPedido, Mercado mercado, List<ItemPedido> itens) {
+    public Pedido(Long id, LocalDate dataSolicitacao, BigDecimal valorTotal, StatusPedido statusPedido, BigDecimal valorPago, Mercado mercado, List<ItemPedido> itens) {
         this.id = id;
         this.dataSolicitacao = dataSolicitacao;
         this.valorTotal = valorTotal;
         this.statusPedido = statusPedido;
+        this.valorPago = valorPago;
         this.mercado = mercado;
         this.itens = itens;
     }
@@ -92,5 +96,13 @@ public class Pedido {
 
     public void setItens(List<ItemPedido> itens) {
         this.itens = itens;
+    }
+
+    public BigDecimal getValorPago() {
+        return valorPago;
+    }
+
+    public void setValorPago(BigDecimal valorPago) {
+        this.valorPago = valorPago;
     }
 }

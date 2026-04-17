@@ -21,6 +21,12 @@ public class PedidoResponseDTO {
     @Schema(description = "Status atual do pedido", example = "EM_ANDAMENTO")
     private StatusPedido statusPedido;
 
+    @Schema(description = "Valor pago do pedido", example = "120.00")
+    private BigDecimal valorPago;
+
+    @Schema(description = "Valor a pagar do pedido", example = "100.00")
+    private BigDecimal valorAPagar;
+
     @Schema(description = "Mercado associado ao pedido")
     private MercadoResponseDTO mercado;
 
@@ -30,11 +36,13 @@ public class PedidoResponseDTO {
     public PedidoResponseDTO() {
     }
 
-    public PedidoResponseDTO(Long id, LocalDate dataSolicitacao, BigDecimal valorTotal, StatusPedido statusPedido, MercadoResponseDTO mercado, List<ItemPedidoResponseDTO> itens) {
+    public PedidoResponseDTO(Long id, LocalDate dataSolicitacao, BigDecimal valorTotal, StatusPedido statusPedido, BigDecimal valorPago, BigDecimal valorAPagar, MercadoResponseDTO mercado, List<ItemPedidoResponseDTO> itens) {
         this.id = id;
         this.dataSolicitacao = dataSolicitacao;
         this.valorTotal = valorTotal;
         this.statusPedido = statusPedido;
+        this.valorPago = valorPago;
+        this.valorAPagar = valorAPagar;
         this.mercado = mercado;
         this.itens = itens;
     }
@@ -85,5 +93,21 @@ public class PedidoResponseDTO {
 
     public void setItens(List<ItemPedidoResponseDTO> itens) {
         this.itens = itens;
+    }
+
+    public BigDecimal getValorPago() {
+        return valorPago;
+    }
+
+    public void setValorPago(BigDecimal valorPago) {
+        this.valorPago = valorPago;
+    }
+
+    public BigDecimal getValorAPagar() {
+        return valorAPagar;
+    }
+
+    public void setValorAPagar(BigDecimal valorAPagar) {
+        this.valorAPagar = valorAPagar;
     }
 }
