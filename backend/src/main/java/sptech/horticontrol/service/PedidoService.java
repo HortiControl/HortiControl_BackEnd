@@ -40,6 +40,10 @@ public class PedidoService {
         Mercado mercado = mercadoRepository.findById(dto.getMercadoId())
                 .orElseThrow(() -> new RuntimeException("Mercado não encontrado"));
 
+        if (dto.getItens() == null || dto.getItens().isEmpty()) {
+            throw new RuntimeException("Não é possível criar um pedido sem produtos. Adicione pelo menos um item.");
+        }
+
         Pedido novoPedido = new Pedido();
         novoPedido.setDataSolicitacao(dto.getDataSolicitacao());
         novoPedido.setStatusPedido(StatusPedido.PENDENTE); // Pedido nasce como Ativo
@@ -50,6 +54,7 @@ public class PedidoService {
 
         BigDecimal total = calcularValorTotal(listaItens);
         novoPedido.setValorTotal(total);
+        novoPedido.setValorPago(BigDecimal.ZERO);
 
         return converterParaResponse(pedidoRepository.save(novoPedido));
     }

@@ -97,7 +97,7 @@ public class ProdutoController {
             @ApiResponse(responseCode = "200", description = "Produtos encontrados"),
             @ApiResponse(responseCode = "204", description = "Nenhum produto encontrado")
     })
-    @GetMapping("/produtos/{nome}")
+    @GetMapping("/busca")
     public ResponseEntity<List<ProdutoResponseDTO>> buscarPorNome (@RequestParam String nome) {
 
         List<ProdutoResponseDTO> listaProdutos = produtoService.buscarProdutoPorNome(nome);
