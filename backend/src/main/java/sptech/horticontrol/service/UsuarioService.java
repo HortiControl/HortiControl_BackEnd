@@ -38,6 +38,11 @@ public class UsuarioService {
         return converterParaResponse(usuario);
     }
 
+    public Usuario buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+    }
+
     public UsuarioResponseDTO atualizarPerfil(Long id, UsuarioPerfilRequestDTO dto) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));

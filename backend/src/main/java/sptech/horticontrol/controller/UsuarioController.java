@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import sptech.horticontrol.dtos.LoginDto;
 import sptech.horticontrol.dtos.request.UsuarioPerfilRequestDTO;
 import sptech.horticontrol.dtos.request.UsuarioSenhaRequestDTO;
+import sptech.horticontrol.dtos.response.LoginResponseDTO;
 import sptech.horticontrol.dtos.response.UsuarioResponseDTO;
 import sptech.horticontrol.entity.Usuario;
 import sptech.horticontrol.security.JwtService;
@@ -77,7 +78,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "401", description = "Credenciais inválidas")
     })
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginDto loginDto) {
         try {
             // Delega a validação das credenciais para o AuthenticationManager
             // Ele chama o UsuarioDetailsService e compara a senha com BCrypt
@@ -86,12 +87,15 @@ public class UsuarioController {
             );
         } catch (BadCredentialsException e) {
             // Credenciais inválidas — retorna 401 sem detalhes (não diga se foi o e-mail ou a senha)
-            return ResponseEntity.status(401).body("Credenciais inválidas");
+            return ResponseEntity.status(401).build();
         }
+
+        // Busca a entidade Usuario completa
+        Usuario usuario = usuarioService.buscarPorEmail(loginDto.email());
 
         // Se chegou aqui, as credenciais são válidas — gera e retorna o token
         String token = jwtService.gerarToken(loginDto.email());
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(new LoginResponseDTO(token, usuario.getIdUsuario()));
     }
 
     @Operation(
