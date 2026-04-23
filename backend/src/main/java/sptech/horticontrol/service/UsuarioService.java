@@ -55,6 +55,9 @@ public class UsuarioService {
     }
 
     public void atualizarSenha(Long id, UsuarioSenhaRequestDTO dto) {
+
+        System.out.println("Senha atual recebida do front: " + dto.getSenhaAtual());
+
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 

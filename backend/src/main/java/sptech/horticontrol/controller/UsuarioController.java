@@ -152,7 +152,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Senha atual incorreta"),
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
-    @PatchMapping("/senha/{id}")
+    @PutMapping("/senha/{id}")
     public ResponseEntity<Void> atualizarSenha(@PathVariable Long id, @RequestBody UsuarioSenhaRequestDTO dto) {
 
         usuarioService.atualizarSenha(id, dto);
