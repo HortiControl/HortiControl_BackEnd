@@ -109,6 +109,20 @@ public class UsuarioController {
     }
 
     @Operation(
+            summary = "Buscar usuário por ID",
+            description = "Retorna os dados do perfil de um usuário específico (usado para carregar o Perfil)",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Usuário encontrado"),
+            @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<UsuarioResponseDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(usuarioService.buscarPorId(id));
+    }
+
+    @Operation(
             summary = "Atualizar perfil",
             description = "Atualiza nome, email e telefone do usuário",
             security = @SecurityRequirement(name = "bearerAuth")

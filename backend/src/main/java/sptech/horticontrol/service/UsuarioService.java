@@ -31,8 +31,11 @@ public class UsuarioService {
         return usuarioRepository.findAll();
     }
 
-    public Usuario buscarPorEmail(String email) {
-        return usuarioRepository.findByEmail(email).orElse(null);
+    public UsuarioResponseDTO buscarPorId(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        return converterParaResponse(usuario);
     }
 
     public UsuarioResponseDTO atualizarPerfil(Long id, UsuarioPerfilRequestDTO dto) {
