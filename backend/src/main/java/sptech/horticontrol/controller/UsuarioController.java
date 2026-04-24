@@ -99,6 +99,18 @@ public class UsuarioController {
         return ResponseEntity.ok(new LoginResponseDTO(token, usuario.getIdUsuario()));
     }
 
+    // GET /usuarios/logout
+    @GetMapping("/logout")
+    @Operation(
+            summary = "Logout",
+            description = "Encerra a sessão do usuário. O frontend deve descartar o token JWT.",
+            security = @SecurityRequirement(name = "bearerAuth")
+    )
+    @ApiResponse(responseCode = "200", description = "Logout realizado com sucesso")
+    public ResponseEntity<String> logout() {
+        return ResponseEntity.ok("Logout realizado com sucesso!!");
+    }
+
     @Operation(
             summary = "Listar usuários",
             description = "Retorna todos os usuários cadastrados",
