@@ -13,6 +13,8 @@ import sptech.horticontrol.entity.Mercado;
 import sptech.horticontrol.entity.Pedido;
 import sptech.horticontrol.entity.Produto;
 import sptech.horticontrol.enums.StatusPedido;
+import sptech.horticontrol.exceptions.RecursoNaoEncontradoException;
+import sptech.horticontrol.exceptions.RegraNegocioException;
 import sptech.horticontrol.repository.MercadoRepository;
 import sptech.horticontrol.repository.PedidoRepository;
 import sptech.horticontrol.repository.ProdutoRepository;
@@ -38,15 +40,15 @@ public class PedidoService {
     public PedidoResponseDTO criarPedido(PedidoRequestDTO dto) {
 
         Mercado mercado = mercadoRepository.findById(dto.getMercadoId())
-                .orElseThrow(() -> new RuntimeException("Mercado não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Mercado não encontrado"));
 
         if (dto.getItens() == null || dto.getItens().isEmpty()) {
-            throw new RuntimeException("Não é possível criar um pedido sem produtos. Adicione pelo menos um item.");
+            throw new RegraNegocioException("Não é possível criar um pedido sem produtos.");
         }
 
         Pedido novoPedido = new Pedido();
         novoPedido.setDataSolicitacao(dto.getDataSolicitacao());
-        novoPedido.setStatusPedido(StatusPedido.PENDENTE); // Pedido nasce como Ativo
+        novoPedido.setStatusPedido(StatusPedido.PENDENTE);
         novoPedido.setMercado(mercado);
 
         List<ItemPedido> listaItens = processarItens(dto.getItens(), novoPedido);
@@ -93,52 +95,54 @@ public class PedidoService {
     public void atualizarStatusPedido(Long id, StatusPedido novoStatus) {
 
         Pedido pedido = pedidoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado"));
 
         if (pedido.getStatusPedido() != StatusPedido.PENDENTE) {
-            throw new RuntimeException("Não é possível alterar o status de um pedido já finalizado.");
+            throw new RegraNegocioException("Pedido já finalizado não pode ser alterado.");
         }
 
         pedido.setStatusPedido(novoStatus);
         pedidoRepository.save(pedido);
-
     }
 
     public void registrarPagamento(Long id, BigDecimal valorPagamento) {
 
         Pedido pedido = pedidoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Pedido não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado"));
 
         if (valorPagamento.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("O valor do pagamento deve ser maior que zero.");
+            throw new RegraNegocioException("Valor deve ser maior que zero");
         }
 
-        BigDecimal novoValorPago = pedido.getValorPago().add(valorPagamento);
+        BigDecimal novoValor = pedido.getValorPago().add(valorPagamento);
 
-        if (novoValorPago.compareTo(pedido.getValorTotal()) > 0) {
-            throw new RuntimeException("O valor pago não pode ultrapassar o valor total do pedido.");
+        if (novoValor.compareTo(pedido.getValorTotal()) > 0) {
+            throw new RegraNegocioException("Pagamento excede valor total");
         }
 
-        pedido.setValorPago(novoValorPago);
+        pedido.setValorPago(novoValor);
         pedidoRepository.save(pedido);
     }
 
     private List<ItemPedido> processarItens(List<ItemPedidoRequestDTO> itensDto, Pedido pedido) {
-        List<ItemPedido> entidades = new ArrayList<>();
 
-        for (ItemPedidoRequestDTO itemDto : itensDto) {
-            Produto produto = produtoRepository.findById(itemDto.getProdutoId())
-                    .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        List<ItemPedido> itens = new ArrayList<>();
+
+        for (ItemPedidoRequestDTO dto : itensDto) {
+
+            Produto produto = produtoRepository.findById(dto.getProdutoId())
+                    .orElseThrow(() -> new RecursoNaoEncontradoException("Produto não encontrado"));
 
             ItemPedido item = new ItemPedido();
             item.setPedido(pedido);
             item.setProduto(produto);
-            item.setQuantidade(itemDto.getQuantidade());
+            item.setQuantidade(dto.getQuantidade());
             item.setPrecoUnitario(produto.getPreco());
 
-            entidades.add(item);
+            itens.add(item);
         }
-        return entidades;
+
+        return itens;
     }
 
     private BigDecimal calcularValorTotal(List<ItemPedido> itens) {
@@ -151,20 +155,31 @@ public class PedidoService {
 
         BigDecimal valorAPagar = p.getValorTotal().subtract(p.getValorPago());
 
-        MercadoResponseDTO converterMercado = new MercadoResponseDTO(
-                p.getMercado().getId(), p.getMercado().getNome(),
-                p.getMercado().getTipoMercado(), p.getMercado().getObservacao()
+        MercadoResponseDTO mercado = new MercadoResponseDTO(
+                p.getMercado().getId(),
+                p.getMercado().getNome(),
+                p.getMercado().getTipoMercado(),
+                p.getMercado().getObservacao()
         );
 
-        List<ItemPedidoResponseDTO> converterItens = p.getItens().stream()
+        List<ItemPedidoResponseDTO> itens = p.getItens().stream()
                 .map(i -> new ItemPedidoResponseDTO(
-                        i.getId(), i.getProduto().getNome(), i.getQuantidade(),
-                        i.getPrecoUnitario(), i.getSubTotal()
+                        i.getId(),
+                        i.getProduto().getNome(),
+                        i.getQuantidade(),
+                        i.getPrecoUnitario(),
+                        i.getSubTotal()
                 )).collect(Collectors.toList());
 
         return new PedidoResponseDTO(
-                p.getId(), p.getDataSolicitacao(), p.getValorTotal(),
-                p.getStatusPedido(), p.getValorPago(), valorAPagar,  converterMercado, converterItens
+                p.getId(),
+                p.getDataSolicitacao(),
+                p.getValorTotal(),
+                p.getStatusPedido(),
+                p.getValorPago(),
+                valorAPagar,
+                mercado,
+                itens
         );
     }
 }

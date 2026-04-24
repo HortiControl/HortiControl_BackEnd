@@ -6,6 +6,8 @@ import sptech.horticontrol.dtos.request.UsuarioPerfilRequestDTO;
 import sptech.horticontrol.dtos.request.UsuarioSenhaRequestDTO;
 import sptech.horticontrol.dtos.response.UsuarioResponseDTO;
 import sptech.horticontrol.entity.Usuario;
+import sptech.horticontrol.exceptions.RecursoNaoEncontradoException;
+import sptech.horticontrol.exceptions.RegraNegocioException;
 import sptech.horticontrol.repository.UsuarioRepository;
 
 import java.util.List;
@@ -33,19 +35,20 @@ public class UsuarioService {
 
     public UsuarioResponseDTO buscarPorId(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
 
         return converterParaResponse(usuario);
     }
 
     public Usuario buscarPorEmail(String email) {
         return usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
     }
 
     public UsuarioResponseDTO atualizarPerfil(Long id, UsuarioPerfilRequestDTO dto) {
+
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
 
         usuario.setNome(dto.getNome());
         usuario.setEmail(dto.getEmail());
@@ -56,17 +59,13 @@ public class UsuarioService {
 
     public void atualizarSenha(Long id, UsuarioSenhaRequestDTO dto) {
 
-        System.out.println("Senha atual recebida do front: " + dto.getSenhaAtual());
-
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
 
-        // Valida se a senha atual digitada confere com a do banco
         if (!passwordEncoder.matches(dto.getSenhaAtual(), usuario.getSenha())) {
-            throw new RuntimeException("Senha atual incorreta");
+            throw new RegraNegocioException("Senha atual incorreta");
         }
 
-        // Encripta a nova senha antes de salvar
         usuario.setSenha(passwordEncoder.encode(dto.getNovaSenha()));
         usuarioRepository.save(usuario);
     }

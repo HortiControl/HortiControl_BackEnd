@@ -6,6 +6,8 @@ import sptech.horticontrol.dtos.request.ProdutoRequestDTO;
 import sptech.horticontrol.dtos.response.ProdutoResponseDTO;
 import sptech.horticontrol.entity.Produto;
 import sptech.horticontrol.enums.TipoProduto;
+import sptech.horticontrol.exceptions.RecursoNaoEncontradoException;
+import sptech.horticontrol.exceptions.RegraNegocioException;
 import sptech.horticontrol.repository.ProdutoRepository;
 
 import java.math.BigDecimal;
@@ -42,7 +44,7 @@ public class ProdutoService {
     public ProdutoResponseDTO atualizarProduto (Long id, ProdutoRequestDTO dto) {
 
         Produto produtoExistente = produtoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Produto não encontrado"));
 
         produtoExistente.setNome(dto.getNome());
         produtoExistente.setPreco(dto.getPreco());
@@ -56,8 +58,8 @@ public class ProdutoService {
 
     public void excluirProduto (Long id) {
 
-        if(!produtoRepository.existsById(id)) {
-            throw new RuntimeException("ID não existe");
+        if (!produtoRepository.existsById(id)) {
+            throw new RecursoNaoEncontradoException("Produto não encontrado");
         }
 
         produtoRepository.deleteById(id);
@@ -76,7 +78,7 @@ public class ProdutoService {
     public void reajustarPrecoGlobal (BigDecimal novoPreco) {
 
         if (novoPreco.compareTo(BigDecimal.ZERO) < 0) {
-            throw new RuntimeException("O preço não pode ser negativo");
+            throw new RegraNegocioException("Preço não pode ser negativo");
         }
 
         List<Produto> produtosPreLavados = produtoRepository.findByTipoProduto(TipoProduto.PRE_LAVADO);

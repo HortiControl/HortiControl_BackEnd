@@ -1,6 +1,9 @@
 package sptech.horticontrol.dtos.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import sptech.horticontrol.enums.StatusPedido;
 
 import java.time.LocalDate;
@@ -8,10 +11,8 @@ import java.util.List;
 
 public class PedidoRequestDTO {
 
-    @Schema(
-            description = "Data da solicitação do pedido",
-            example = "2026-04-10"
-    )
+    @NotNull(message = "dataSolicitacao é obrigatória")
+    @Schema(description = "Data da solicitação", example = "2026-04-10")
     private LocalDate dataSolicitacao;
 
     @Schema(
@@ -26,6 +27,8 @@ public class PedidoRequestDTO {
     )
     private Long mercadoId;
 
+    @NotEmpty(message = "pedido deve ter ao menos um item")
+    @Valid
     @Schema(
             description = "Lista de itens do pedido"
     )

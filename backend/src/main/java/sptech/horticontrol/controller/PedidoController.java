@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +38,7 @@ public class PedidoController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos")
     })
     @PostMapping
-    public ResponseEntity<PedidoResponseDTO> criar(@RequestBody PedidoRequestDTO pedidoDto) {
+    public ResponseEntity<PedidoResponseDTO> criar(@RequestBody @Valid PedidoRequestDTO pedidoDto) {
         PedidoResponseDTO novoPedido = pedidoService.criarPedido(pedidoDto);
         return ResponseEntity.status(201).body(novoPedido);
     }

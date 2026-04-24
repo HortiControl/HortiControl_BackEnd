@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -30,10 +31,8 @@ public class ProdutoController {
             @ApiResponse(responseCode = "401", description = "Não autorizado")
     })
     @PostMapping
-    public ResponseEntity<ProdutoResponseDTO> criar (@RequestBody ProdutoRequestDTO dto) {
-
+    public ResponseEntity<ProdutoResponseDTO> criar(@RequestBody @Valid ProdutoRequestDTO dto) {
         return ResponseEntity.status(201).body(produtoService.criarProduto(dto));
-
     }
 
     @Operation(
@@ -67,10 +66,11 @@ public class ProdutoController {
             @ApiResponse(responseCode = "404", description = "Produto não encontrado")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<ProdutoResponseDTO> atualizar (@PathVariable Long id, @RequestBody ProdutoRequestDTO dto) {
+    public ResponseEntity<ProdutoResponseDTO> atualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid ProdutoRequestDTO dto) {
 
         return ResponseEntity.ok(produtoService.atualizarProduto(id, dto));
-
     }
 
     @Operation(

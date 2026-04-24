@@ -1,24 +1,24 @@
 package sptech.horticontrol.dtos.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import sptech.horticontrol.enums.TipoMercado;
 
 public class MercadoRequestDTO {
 
-    @Schema(
-            description = "Nome do mercado",
-            example = "Mercado Central"
-    )
+    @NotBlank(message = "nome é obrigatório")
+    @Size(max = 100, message = "nome deve ter no máximo 100 caracteres")
+    @Schema(description = "Nome do mercado", example = "Mercado Central")
     private String nome;
-    @Schema(
-            description = "Tipo do mercado",
-            example = "SUPERMERCADO"
-    )
+
+    @NotNull(message = "tipoMercado é obrigatório")
+    @Schema(description = "Tipo do mercado", example = "SUPERMERCADO")
     private TipoMercado tipoMercado;
-    @Schema(
-            description = "Observações adicionais",
-            example = "Atendimento 24 horas"
-    )
+
+    @Size(max = 255, message = "observacao deve ter no máximo 255 caracteres")
+    @Schema(description = "Observações adicionais", example = "Atendimento 24 horas")
     private String observacao;
 
     public MercadoRequestDTO() {

@@ -1,8 +1,13 @@
 package sptech.horticontrol.dtos.request;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+
 public class ItemPedidoRequestDTO {
 
     private Long produtoId;
+    @NotNull(message = "quantidade é obrigatória")
+    @Min(value = 1, message = "quantidade deve ser no mínimo 1")
     private Integer quantidade;
 
     public ItemPedidoRequestDTO() {

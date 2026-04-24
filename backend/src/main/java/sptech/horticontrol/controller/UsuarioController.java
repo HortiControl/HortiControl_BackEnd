@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -62,7 +63,7 @@ public class UsuarioController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos")
     })
     @PostMapping
-    public ResponseEntity<Usuario> cadastrar(@RequestBody Usuario usuario) {
+    public ResponseEntity<Usuario> cadastrar(@RequestBody @Valid Usuario usuario) {
         return ResponseEntity.status(201).body(usuarioService.cadastrar(usuario));
     }
 
@@ -136,10 +137,11 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
     @PutMapping("/perfil/{id}")
-    public ResponseEntity<UsuarioResponseDTO> atualizarPerfil(@PathVariable Long id, @RequestBody UsuarioPerfilRequestDTO dto) {
+    public ResponseEntity<UsuarioResponseDTO> atualizarPerfil(
+            @PathVariable Long id,
+            @RequestBody @Valid UsuarioPerfilRequestDTO dto) {
 
         return ResponseEntity.ok(usuarioService.atualizarPerfil(id, dto));
-
     }
 
     @Operation(
@@ -153,11 +155,12 @@ public class UsuarioController {
             @ApiResponse(responseCode = "404", description = "Usuário não encontrado")
     })
     @PutMapping("/senha/{id}")
-    public ResponseEntity<Void> atualizarSenha(@PathVariable Long id, @RequestBody UsuarioSenhaRequestDTO dto) {
+    public ResponseEntity<Void> atualizarSenha(
+            @PathVariable Long id,
+            @RequestBody @Valid UsuarioSenhaRequestDTO dto) {
 
         usuarioService.atualizarSenha(id, dto);
         return ResponseEntity.status(204).build();
-
     }
 
 }

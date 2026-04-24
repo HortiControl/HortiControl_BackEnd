@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,10 +36,8 @@ public class MercadoController {
             @ApiResponse(responseCode = "400", description = "Dados inválidos")
     })
     @PostMapping
-    public ResponseEntity<MercadoResponseDTO> criar(@RequestBody MercadoRequestDTO dto) {
-
+    public ResponseEntity<MercadoResponseDTO> criar(@RequestBody @Valid MercadoRequestDTO dto) {
         return ResponseEntity.status(201).body(mercadoService.criarMercado(dto));
-
     }
 
     @Operation(
@@ -71,10 +70,11 @@ public class MercadoController {
             @ApiResponse(responseCode = "404", description = "Mercado não encontrado")
     })
     @PutMapping("/{id}")
-    public ResponseEntity<MercadoResponseDTO> atualizar(@PathVariable Long id, @RequestBody MercadoRequestDTO dto) {
+    public ResponseEntity<MercadoResponseDTO> atualizar(
+            @PathVariable Long id,
+            @RequestBody @Valid MercadoRequestDTO dto) {
 
         return ResponseEntity.ok(mercadoService.atualizarMercado(id, dto));
-
     }
 
     @Operation(
