@@ -66,10 +66,10 @@ public class ProdutoController {
             @ApiResponse(responseCode = "204", description = "Nenhum produto encontrado")
     })
 
-    @GetMapping
+    @GetMapping("/tipo/{preLavado}")
     public ResponseEntity<List<ProdutoResponseDTO>> listarPreLavados () {
 
-        List<ProdutoResponseDTO> lista = produtoService.listarPreLavados();
+        List<ProdutoResponseDTO> lista = produtoService.ProdutosPreLavados();
 
         if (lista.isEmpty()) {
             return ResponseEntity.status(204).build();
@@ -88,10 +88,10 @@ public class ProdutoController {
             @ApiResponse(responseCode = "204", description = "Nenhum produto encontrado")
     })
 
-    @GetMapping
+    @GetMapping("/tipo/{naoLavado}")
     public ResponseEntity<List<ProdutoResponseDTO>> listarNaoLavados () {
 
-        List<ProdutoResponseDTO> lista = produtoService.listarNaoLavados();
+        List<ProdutoResponseDTO> lista = produtoService.ProdutosNaoLavados();
 
         if (lista.isEmpty()) {
             return ResponseEntity.status(204).build();

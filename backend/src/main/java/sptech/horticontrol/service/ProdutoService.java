@@ -41,14 +41,14 @@ public class ProdutoService {
 
     }
 
-    public List<ProdutoResponseDTO> listarPreLavados() {
+    public List<ProdutoResponseDTO> ProdutosPreLavados() {
         return produtoRepository.findByTipoProduto(TipoProduto.PRE_LAVADO)
                 .stream()
                 .map(this::converterParaResponse)
                 .collect(Collectors.toList());
     }
 
-    public List<ProdutoResponseDTO> listarNaoLavados() {
+    public List<ProdutoResponseDTO> ProdutosNaoLavados() {
         return produtoRepository.findByTipoProduto(TipoProduto.NAO_LAVADO)
                 .stream()
                 .map(this::converterParaResponse)
