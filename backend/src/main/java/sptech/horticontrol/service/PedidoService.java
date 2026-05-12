@@ -48,7 +48,7 @@ public class PedidoService {
 
         Pedido novoPedido = new Pedido();
         novoPedido.setDataSolicitacao(dto.getDataSolicitacao());
-        novoPedido.setStatusPedido(StatusPedido.PENDENTE);
+        novoPedido.setStatusPedido(StatusPedido.ATIVO);
         novoPedido.setMercado(mercado);
 
         List<ItemPedido> listaItens = processarItens(dto.getItens(), novoPedido);
@@ -65,9 +65,9 @@ public class PedidoService {
         List<Pedido> pedidosAtivos;
 
         if (mercadoId != null) {
-            pedidosAtivos = pedidoRepository.findByMercadoIdAndStatusPedido(mercadoId, StatusPedido.PENDENTE);
+            pedidosAtivos = pedidoRepository.findByMercadoIdAndStatusPedido(mercadoId, StatusPedido.ATIVO);
         } else {
-            pedidosAtivos = pedidoRepository.findByStatusPedido(StatusPedido.PENDENTE);
+            pedidosAtivos = pedidoRepository.findByStatusPedido(StatusPedido.ATIVO);
         }
 
         return pedidosAtivos.stream()
@@ -77,7 +77,7 @@ public class PedidoService {
 
     public List<PedidoResponseDTO> listarHistoricoPedidos(Long mercadoId) {
 
-        List<StatusPedido> statusFechados = List.of(StatusPedido.CONCLUIDO, StatusPedido.CANCELADO);
+        List<StatusPedido> statusFechados = List.of(StatusPedido.CONCLUIDO);
         List<Pedido> pedidosHistorico;
 
         if (mercadoId != null) {
@@ -97,7 +97,7 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado"));
 
-        if (pedido.getStatusPedido() != StatusPedido.PENDENTE) {
+        if (pedido.getStatusPedido() != StatusPedido.ATIVO) {
             throw new RegraNegocioException("Pedido já finalizado não pode ser alterado.");
         }
 
@@ -105,23 +105,26 @@ public class PedidoService {
         pedidoRepository.save(pedido);
     }
 
+    @Transactional
     public void registrarPagamento(Long id, BigDecimal valorPagamento) {
 
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado"));
 
-        if (valorPagamento.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RegraNegocioException("Valor deve ser maior que zero");
-        }
+        BigDecimal novoValorPago = pedido.getValorPago().add(valorPagamento);
 
-        BigDecimal novoValor = pedido.getValorPago().add(valorPagamento);
-
-        if (novoValor.compareTo(pedido.getValorTotal()) > 0) {
+        if (novoValorPago.compareTo(pedido.getValorTotal()) > 0) {
             throw new RegraNegocioException("Pagamento excede valor total");
         }
 
-        pedido.setValorPago(novoValor);
+        pedido.setValorPago(novoValorPago);
+
+        if (novoValorPago.compareTo(pedido.getValorTotal()) == 0) {
+            pedido.setStatusPedido(StatusPedido.CONCLUIDO);
+        }
+
         pedidoRepository.save(pedido);
+
     }
 
     private List<ItemPedido> processarItens(List<ItemPedidoRequestDTO> itensDto, Pedido pedido) {
@@ -158,8 +161,7 @@ public class PedidoService {
         MercadoResponseDTO mercado = new MercadoResponseDTO(
                 p.getMercado().getId(),
                 p.getMercado().getNome(),
-                p.getMercado().getTipoMercado(),
-                p.getMercado().getObservacao()
+                p.getMercado().getTipoMercado()
         );
 
         List<ItemPedidoResponseDTO> itens = p.getItens().stream()

@@ -17,10 +17,6 @@ public class MercadoRequestDTO {
     @Schema(description = "Tipo do mercado", example = "SUPERMERCADO")
     private TipoMercado tipoMercado;
 
-    @Size(max = 255, message = "observacao deve ter no máximo 255 caracteres")
-    @Schema(description = "Observações adicionais", example = "Atendimento 24 horas")
-    private String observacao;
-
     public MercadoRequestDTO() {
     }
 
@@ -40,11 +36,4 @@ public class MercadoRequestDTO {
         this.tipoMercado = tipoMercado;
     }
 
-    public String getObservacao() {
-        return observacao;
-    }
-
-    public void setObservacao(String observacao) {
-        this.observacao = observacao;
-    }
 }

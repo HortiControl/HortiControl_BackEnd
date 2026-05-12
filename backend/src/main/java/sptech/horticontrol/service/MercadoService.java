@@ -22,7 +22,6 @@ public class MercadoService {
         Mercado novoMercado = new Mercado();
         novoMercado.setNome(dto.getNome());
         novoMercado.setTipoMercado(dto.getTipoMercado());
-        novoMercado.setObservacao(dto.getObservacao());
 
         return converterParaResponse(mercadoRepository.save(novoMercado));
 
@@ -43,7 +42,6 @@ public class MercadoService {
 
         mercadoExistente.setNome(dto.getNome());
         mercadoExistente.setTipoMercado(dto.getTipoMercado());
-        mercadoExistente.setObservacao(dto.getObservacao());
 
         return converterParaResponse(mercadoRepository.save(mercadoExistente));
     }
@@ -59,7 +57,7 @@ public class MercadoService {
 
     private MercadoResponseDTO converterParaResponse(Mercado m) {
 
-        return new MercadoResponseDTO(m.getId(), m.getNome(), m.getTipoMercado(), m.getObservacao());
+        return new MercadoResponseDTO(m.getId(), m.getNome(), m.getTipoMercado());
 
     }
 

@@ -58,6 +58,50 @@ public class ProdutoController {
     }
 
     @Operation(
+            summary = "Listar produtos pré-lavados",
+            description = "Retorna todos os produtos pré-lavados cadastrados"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de produtos retornada"),
+            @ApiResponse(responseCode = "204", description = "Nenhum produto encontrado")
+    })
+
+    @GetMapping
+    public ResponseEntity<List<ProdutoResponseDTO>> listarPreLavados () {
+
+        List<ProdutoResponseDTO> lista = produtoService.listarPreLavados();
+
+        if (lista.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        } else {
+            return ResponseEntity.ok(lista);
+        }
+
+    }
+
+    @Operation(
+            summary = "Listar produtos não lavados",
+            description = "Retorna todos os produtos não lavados cadastrados"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de produtos retornada"),
+            @ApiResponse(responseCode = "204", description = "Nenhum produto encontrado")
+    })
+
+    @GetMapping
+    public ResponseEntity<List<ProdutoResponseDTO>> listarNaoLavados () {
+
+        List<ProdutoResponseDTO> lista = produtoService.listarNaoLavados();
+
+        if (lista.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        } else {
+            return ResponseEntity.ok(lista);
+        }
+
+    }
+
+    @Operation(
             summary = "Atualizar produto",
             description = "Atualiza os dados de um produto existente"
     )

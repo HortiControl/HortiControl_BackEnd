@@ -19,17 +19,13 @@ public class Mercado {
     @Enumerated(EnumType.STRING)
     private TipoMercado tipoMercado;
 
-    @Column(name = "observacao", length = 255, nullable = false)
-    private String observacao;
-
     public Mercado() {
     }
 
-    public Mercado(Long id, String nome, TipoMercado tipoMercado, String observacao) {
+    public Mercado(Long id, String nome, TipoMercado tipoMercado) {
         this.id = id;
         this.nome = nome;
         this.tipoMercado = tipoMercado;
-        this.observacao = observacao;
     }
 
     public Long getId() {
@@ -56,11 +52,4 @@ public class Mercado {
         this.tipoMercado = tipoMercado;
     }
 
-    public String getObservacao() {
-        return observacao;
-    }
-
-    public void setObservacao(String observacao) {
-        this.observacao = observacao;
-    }
 }

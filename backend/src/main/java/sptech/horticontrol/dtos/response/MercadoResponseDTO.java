@@ -14,17 +14,13 @@ public class MercadoResponseDTO {
     @Schema(description = "Tipo do mercado", example = "SUPERMERCADO")
     private TipoMercado tipoMercado;
 
-    @Schema(description = "Observações adicionais", example = "Atendimento 24 horas")
-    private String observacao;
-
     public MercadoResponseDTO() {
     }
 
-    public MercadoResponseDTO(Long id, String nome, TipoMercado tipo, String observacao) {
+    public MercadoResponseDTO(Long id, String nome, TipoMercado tipo) {
         this.id = id;
         this.nome = nome;
         this.tipoMercado = tipo;
-        this.observacao = observacao;
     }
 
     public Long getId() {
@@ -51,11 +47,4 @@ public class MercadoResponseDTO {
         this.tipoMercado = tipoMercado;
     }
 
-    public String getObservacao() {
-        return observacao;
-    }
-
-    public void setObservacao(String observacao) {
-        this.observacao = observacao;
-    }
 }
