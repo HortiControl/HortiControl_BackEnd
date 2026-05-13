@@ -20,6 +20,7 @@ import sptech.horticontrol.repository.PedidoRepository;
 import sptech.horticontrol.repository.ProdutoRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +37,6 @@ public class PedidoService {
     @Autowired
     private MercadoRepository mercadoRepository;
 
-    @Transactional
     public PedidoResponseDTO criarPedido(PedidoRequestDTO dto) {
 
         Mercado mercado = mercadoRepository.findById(dto.getMercadoId())
@@ -47,7 +47,7 @@ public class PedidoService {
         }
 
         Pedido novoPedido = new Pedido();
-        novoPedido.setDataSolicitacao(dto.getDataSolicitacao());
+        novoPedido.setDataSolicitacao(LocalDate.now());
         novoPedido.setStatusPedido(StatusPedido.ATIVO);
         novoPedido.setMercado(mercado);
 
@@ -91,7 +91,6 @@ public class PedidoService {
                 .collect(Collectors.toList());
     }
 
-    @Transactional
     public void atualizarStatusPedido(Long id, StatusPedido novoStatus) {
 
         Pedido pedido = pedidoRepository.findById(id)
@@ -114,15 +113,41 @@ public class PedidoService {
         BigDecimal novoValorPago = pedido.getValorPago().add(valorPagamento);
 
         if (novoValorPago.compareTo(pedido.getValorTotal()) > 0) {
-            throw new RegraNegocioException("Pagamento excede valor total");
+            throw new RegraNegocioException("O valor informado excede o saldo devedor do pedido.");
         }
 
         pedido.setValorPago(novoValorPago);
 
-        if (novoValorPago.compareTo(pedido.getValorTotal()) == 0) {
+        if (novoValorPago.compareTo(pedido.getValorTotal()) >= 0) {
             pedido.setStatusPedido(StatusPedido.CONCLUIDO);
         }
 
+        pedidoRepository.save(pedido);
+
+    }
+
+    public void deletarPedido(Long id) {
+
+        if (!pedidoRepository.existsById(id)) {
+            throw new RecursoNaoEncontradoException("Pedido não encontrado");
+        }
+
+        pedidoRepository.deleteById(id);
+
+    }
+
+    public void removerItemDoPedido(Long pedidoId, Long itemId) {
+
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Pedido não encontrado"));
+
+        boolean removido = pedido.getItens().removeIf(item -> item.getId().equals(itemId));
+
+        if (!removido) {
+            throw new RecursoNaoEncontradoException("Item não encontrado no pedido");
+        }
+
+        pedido.setValorTotal(calcularValorTotal(pedido.getItens()));
         pedidoRepository.save(pedido);
 
     }
@@ -168,6 +193,7 @@ public class PedidoService {
                 .map(i -> new ItemPedidoResponseDTO(
                         i.getId(),
                         i.getProduto().getNome(),
+                        i.getProduto().getTipoProduto(),
                         i.getQuantidade(),
                         i.getPrecoUnitario(),
                         i.getSubTotal()

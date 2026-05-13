@@ -110,4 +110,5 @@ public class PedidoResponseDTO {
     public void setValorAPagar(BigDecimal valorAPagar) {
         this.valorAPagar = valorAPagar;
     }
+
 }

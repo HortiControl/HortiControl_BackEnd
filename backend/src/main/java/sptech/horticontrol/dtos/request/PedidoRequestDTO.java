@@ -11,47 +11,15 @@ import java.util.List;
 
 public class PedidoRequestDTO {
 
-    @NotNull(message = "dataSolicitacao é obrigatória")
-    @Schema(description = "Data da solicitação", example = "2026-04-10")
-    private LocalDate dataSolicitacao;
-
-    @Schema(
-            description = "Status inicial do pedido",
-            example = "EM_ANDAMENTO"
-    )
-    private StatusPedido statusPedido;
-
-    @Schema(
-            description = "ID do mercado associado ao pedido",
-            example = "1"
-    )
+    @Schema(description = "ID do mercado associado ao pedido", example = "1")
     private Long mercadoId;
 
     @NotEmpty(message = "pedido deve ter ao menos um item")
     @Valid
-    @Schema(
-            description = "Lista de itens do pedido"
-    )
+    @Schema(description = "Lista de itens do pedido")
     private List<ItemPedidoRequestDTO> itens;
 
-
     public PedidoRequestDTO() {
-    }
-
-    public LocalDate getDataSolicitacao() {
-        return dataSolicitacao;
-    }
-
-    public void setDataSolicitacao(LocalDate dataSolicitacao) {
-        this.dataSolicitacao = dataSolicitacao;
-    }
-
-    public StatusPedido getStatusPedido() {
-        return statusPedido;
-    }
-
-    public void setStatusPedido(StatusPedido statusPedido) {
-        this.statusPedido = statusPedido;
     }
 
     public Long getMercadoId() {

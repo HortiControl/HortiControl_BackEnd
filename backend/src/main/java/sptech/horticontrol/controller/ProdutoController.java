@@ -66,7 +66,7 @@ public class ProdutoController {
             @ApiResponse(responseCode = "204", description = "Nenhum produto encontrado")
     })
 
-    @GetMapping("/tipo/{preLavado}")
+    @GetMapping("/pre-lavados")
     public ResponseEntity<List<ProdutoResponseDTO>> listarPreLavados () {
 
         List<ProdutoResponseDTO> lista = produtoService.ProdutosPreLavados();
@@ -88,7 +88,7 @@ public class ProdutoController {
             @ApiResponse(responseCode = "204", description = "Nenhum produto encontrado")
     })
 
-    @GetMapping("/tipo/{naoLavado}")
+    @GetMapping("/nao-lavados")
     public ResponseEntity<List<ProdutoResponseDTO>> listarNaoLavados () {
 
         List<ProdutoResponseDTO> lista = produtoService.ProdutosNaoLavados();

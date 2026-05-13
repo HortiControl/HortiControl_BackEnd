@@ -1,11 +1,14 @@
 package sptech.horticontrol.dtos.response;
 
+import sptech.horticontrol.enums.TipoProduto;
+
 import java.math.BigDecimal;
 
 public class ItemPedidoResponseDTO {
 
     private Long id;
     private String nomeProduto;
+    private TipoProduto tipoProduto;
     private Integer quantidade;
     private BigDecimal precoUnitario;
     private BigDecimal subTotal;
@@ -13,9 +16,10 @@ public class ItemPedidoResponseDTO {
     public ItemPedidoResponseDTO() {
     }
 
-    public ItemPedidoResponseDTO(Long id, String nomeProduto, Integer quantidade, BigDecimal precoUnitario, BigDecimal subTotal) {
+    public ItemPedidoResponseDTO(Long id, String nomeProduto, TipoProduto tipoProduto, Integer quantidade, BigDecimal precoUnitario, BigDecimal subTotal) {
         this.id = id;
         this.nomeProduto = nomeProduto;
+        this.tipoProduto = tipoProduto;
         this.quantidade = quantidade;
         this.precoUnitario = precoUnitario;
         this.subTotal = subTotal;
@@ -35,6 +39,14 @@ public class ItemPedidoResponseDTO {
 
     public void setNomeProduto(String nomeProduto) {
         this.nomeProduto = nomeProduto;
+    }
+
+    public TipoProduto getTipoProduto() {
+        return tipoProduto;
+    }
+
+    public void setTipoProduto(TipoProduto tipoProduto) {
+        this.tipoProduto = tipoProduto;
     }
 
     public Integer getQuantidade() {
