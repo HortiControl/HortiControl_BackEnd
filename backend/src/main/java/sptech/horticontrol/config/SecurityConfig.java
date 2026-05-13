@@ -60,7 +60,9 @@ public class SecurityConfig {
         // Coloque aqui a URL exata do seu Front-end
         configuration.setAllowedOrigins(List.of("http://localhost:5173"));
         // Métodos HTTP permitidos
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedMethods(
+                List.of("GET", "POST", "PUT", "DELETE","PATCH", "OPTIONS")
+        );
         // Permite o envio do header Authorization (seu Token!)
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

@@ -25,7 +25,7 @@ public class Produto {
     @Enumerated(EnumType.STRING)
     private TipoEmbalagem tipoEmbalagem;
 
-    @Column(name = "tipo_produto", length = 45, nullable = false)
+    @Column(name = "tipoProduto", length = 45, nullable = false)
     @Enumerated(EnumType.STRING)
     private TipoProduto tipoProduto;
 
