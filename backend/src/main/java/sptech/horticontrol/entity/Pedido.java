@@ -14,24 +14,24 @@ public class Pedido {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "idPedido")
     private Long id;
 
-    @Column(name = "data_solicitacao", length = 10, nullable = false)
+    @Column(name = "dataSolicitacao", nullable = false)
     private LocalDate dataSolicitacao;
 
-    @Column(name = "valor_total", precision = 10, scale = 2, nullable = false)
+    @Column(name = "valorTotal", precision = 10, scale = 2, nullable = false)
     private BigDecimal valorTotal;
 
-    @Column(name = "status_pedido", length = 15, nullable = false)
+    @Column(name = "statusPedido", length = 15, nullable = false)
     @Enumerated(EnumType.STRING)
     private StatusPedido statusPedido;
 
-    @Column(name = "valor_pago", precision = 10, scale = 2, nullable = false)
+    @Column(name = "valorPago", precision = 10, scale = 2, nullable = false)
     private BigDecimal valorPago = BigDecimal.ZERO;
 
     @ManyToOne
-    @JoinColumn(name = "mercado_id")
+    @JoinColumn(name = "fkMercado", nullable = false)
     private Mercado mercado;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)

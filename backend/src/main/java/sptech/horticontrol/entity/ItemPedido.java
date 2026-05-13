@@ -1,62 +1,80 @@
 package sptech.horticontrol.entity;
 
 import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "item_pedido")
+@Table(name = "itensPedido")
 public class ItemPedido {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "idItensPedido")
     private Long id;
 
     @Column(name = "quantidade", nullable = false)
     private Integer quantidade;
 
-    @Column(name = "preco_unitario", precision = 10, scale = 2, nullable = false)
+    @Column(name = "precoUnitario", precision = 10, scale = 2, nullable = false)
     private BigDecimal precoUnitario;
 
-    @Column(name = "sub_total", precision = 10, scale = 2, nullable = false)
+    @Column(name = "subTotal", precision = 10, scale = 2, nullable = false)
     private BigDecimal subTotal;
 
     @ManyToOne
-    @JoinColumn(name = "pedido_id")
+    @JoinColumn(name = "fkPedido", nullable = false)
     private Pedido pedido;
 
     @ManyToOne
-    @JoinColumn(name = "produto_id")
+    @JoinColumn(name = "fkProduto", nullable = false)
     private Produto produto;
 
     public ItemPedido() {
     }
 
-    public ItemPedido(Long id, Integer quantidade, BigDecimal precoUnitario, BigDecimal subTotal, Pedido pedido, Produto produto) {
+    public ItemPedido(
+            Long id,
+            Integer quantidade,
+            BigDecimal precoUnitario,
+            Pedido pedido,
+            Produto produto
+    ) {
+
         this.id = id;
         this.quantidade = quantidade;
         this.precoUnitario = precoUnitario;
-        this.subTotal = subTotal;
         this.pedido = pedido;
         this.produto = produto;
+
+        calcularSubTotal();
     }
 
     public void setQuantidade(Integer quantidade) {
         this.quantidade = quantidade;
-        this.calcularSubTotal();
+        calcularSubTotal();
     }
 
     public void setPrecoUnitario(BigDecimal precoUnitario) {
         this.precoUnitario = precoUnitario;
-        this.calcularSubTotal();
+        calcularSubTotal();
     }
 
     private void calcularSubTotal() {
+
         if (this.quantidade != null && this.precoUnitario != null) {
-            this.subTotal = this.precoUnitario.multiply(new BigDecimal(this.quantidade));
+
+            this.subTotal =
+                    this.precoUnitario.multiply(
+                            BigDecimal.valueOf(this.quantidade)
+                    );
+
         } else {
+
             this.subTotal = BigDecimal.ZERO;
+
         }
+
     }
 
     public Long getId() {
@@ -79,10 +97,6 @@ public class ItemPedido {
         return subTotal;
     }
 
-    public void setSubTotal(BigDecimal subTotal) {
-        this.subTotal = subTotal;
-    }
-
     public Pedido getPedido() {
         return pedido;
     }
@@ -98,4 +112,5 @@ public class ItemPedido {
     public void setProduto(Produto produto) {
         this.produto = produto;
     }
+
 }

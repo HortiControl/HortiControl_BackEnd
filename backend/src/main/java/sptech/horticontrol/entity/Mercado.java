@@ -15,7 +15,7 @@ public class Mercado {
     @Column(name = "nome", length = 50, nullable = false)
     private String nome;
 
-    @Column(name = "tipo_mercado", length = 20, nullable = false)
+    @Column(name = "tipoMercado", length = 20, nullable = false)
     @Enumerated(EnumType.STRING)
     private TipoMercado tipoMercado;
 

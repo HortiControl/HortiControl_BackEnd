@@ -12,7 +12,7 @@ public class Produto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "idProduto")
     private Long id;
 
     @Column(name = "nome", length = 45, nullable = false)
@@ -21,7 +21,7 @@ public class Produto {
     @Column(name = "preco", precision = 10, scale = 2, nullable = false)
     private BigDecimal preco;
 
-    @Column(name = "embalagem", length = 45, nullable = false)
+    @Column(name = "tipoEmbalagem", length = 45, nullable = false)
     @Enumerated(EnumType.STRING)
     private TipoEmbalagem tipoEmbalagem;
 
