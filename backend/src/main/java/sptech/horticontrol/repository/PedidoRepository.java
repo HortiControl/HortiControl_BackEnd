@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import sptech.horticontrol.entity.Pedido;
 import sptech.horticontrol.enums.StatusPedido;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
@@ -14,4 +15,5 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByStatusPedido(StatusPedido status);
     List<Pedido> findByStatusPedidoIn(List<StatusPedido> statuses);
 
+    List<Pedido> findByDataSolicitacaoBetween(LocalDate inicio, LocalDate fim);
 }
