@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sptech.horticontrol.dtos.request.MercadoRequestDTO;
 import sptech.horticontrol.dtos.response.MercadoResponseDTO;
+import sptech.horticontrol.dtos.response.ProdutoResponseDTO;
 import sptech.horticontrol.service.MercadoService;
 
 import java.util.List;
@@ -58,7 +59,27 @@ public class MercadoController {
         } else {
             return ResponseEntity.ok(listarMercados);
         }
+    }
 
+    @Operation(
+            summary = "Listar Mercados Consignados",
+            description = "Retorna todos os mercados Consignado cadastrados"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de mercados retornada"),
+            @ApiResponse(responseCode = "204", description = "Nenhum mercado encontrado")
+    })
+
+    @GetMapping("/consignados")
+    public ResponseEntity<List<MercadoResponseDTO>> listarConsignados () {
+
+        List<MercadoResponseDTO> lista = mercadoService.MercadosConsignados();
+
+        if (lista.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        } else {
+            return ResponseEntity.ok(lista);
+        }
     }
 
     @Operation(

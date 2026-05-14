@@ -76,7 +76,6 @@ public class ProdutoController {
         } else {
             return ResponseEntity.ok(lista);
         }
-
     }
 
     @Operation(

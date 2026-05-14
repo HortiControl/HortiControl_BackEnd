@@ -4,7 +4,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import sptech.horticontrol.dtos.request.MercadoRequestDTO;
 import sptech.horticontrol.dtos.response.MercadoResponseDTO;
+import sptech.horticontrol.dtos.response.ProdutoResponseDTO;
 import sptech.horticontrol.entity.Mercado;
+import sptech.horticontrol.enums.TipoMercado;
+import sptech.horticontrol.enums.TipoProduto;
 import sptech.horticontrol.exceptions.RecursoNaoEncontradoException;
 import sptech.horticontrol.repository.MercadoRepository;
 
@@ -33,6 +36,13 @@ public class MercadoService {
                 .map(this::converterParaResponse)
                 .collect(Collectors.toList());
 
+    }
+
+    public List<MercadoResponseDTO> MercadosConsignados() {
+        return mercadoRepository.findByTipoMercado(TipoMercado.CONSIGNADO)
+                .stream()
+                .map(this::converterParaResponse)
+                .collect(Collectors.toList());
     }
 
     public MercadoResponseDTO atualizarMercado(Long id, MercadoRequestDTO dto) {
