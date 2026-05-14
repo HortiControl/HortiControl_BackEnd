@@ -9,7 +9,7 @@ public class Mercado {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @Column(name = "idMercado")
     private Long id;
 
     @Column(name = "nome", length = 50, nullable = false)
