@@ -83,6 +83,27 @@ public class MercadoController {
     }
 
     @Operation(
+            summary = "Listar Mercados Normais",
+            description = "Retorna todos os mercados Normais cadastrados"
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Lista de mercados retornada"),
+            @ApiResponse(responseCode = "204", description = "Nenhum mercado encontrado")
+    })
+
+    @GetMapping("/normais")
+    public ResponseEntity<List<MercadoResponseDTO>> listarNormais () {
+
+        List<MercadoResponseDTO> lista = mercadoService.MercadosNormais();
+
+        if (lista.isEmpty()) {
+            return ResponseEntity.status(204).build();
+        } else {
+            return ResponseEntity.ok(lista);
+        }
+    }
+
+    @Operation(
             summary = "Atualizar mercado",
             description = "Atualiza os dados de um mercado pelo ID"
     )

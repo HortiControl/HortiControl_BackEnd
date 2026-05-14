@@ -45,6 +45,13 @@ public class MercadoService {
                 .collect(Collectors.toList());
     }
 
+    public List<MercadoResponseDTO> MercadosNormais() {
+        return mercadoRepository.findByTipoMercado(TipoMercado.NORMAL)
+                .stream()
+                .map(this::converterParaResponse)
+                .collect(Collectors.toList());
+    }
+
     public MercadoResponseDTO atualizarMercado(Long id, MercadoRequestDTO dto) {
 
         Mercado mercadoExistente = mercadoRepository.findById(id)
