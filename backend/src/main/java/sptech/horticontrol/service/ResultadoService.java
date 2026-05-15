@@ -9,10 +9,7 @@ import sptech.horticontrol.repository.PedidoRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,7 +59,8 @@ public class ResultadoService {
                 .sorted(Comparator.comparing(RankingProdutoDTO::quantidadeVendida).reversed())
                 .limit(4).toList();
 
-        List<ChartDataDTO> evolucao = gerarEvolucaoFaturamento(pedidos, periodoUpper, intervalo);
+        String periodoNormalizado = periodoUpper.replace(" ", "_").replace("Ê", "E");
+        List<ChartDataDTO> evolucao = gerarEvolucaoFaturamento(pedidos, periodoNormalizado, intervalo);
 
         List<HistoricoEmbalagemDTO> historico = gerarHistoricoAnual();
 
@@ -113,8 +111,7 @@ public class ResultadoService {
 
             case "ANO" -> new IntervaloDatas(hoje.withDayOfYear(1), hoje);
 
-            default ->
-                    new IntervaloDatas(hoje.minusDays(30), hoje);
+            default -> new IntervaloDatas(hoje.minusDays(30), hoje);
         };
     }
 
@@ -158,43 +155,76 @@ public class ResultadoService {
         };
     }
 
-    private List<ChartDataDTO> gerarEvolucaoFaturamento(List<Pedido> pedidos, String periodo, IntervaloDatas intervalo) {
+    private List<ChartDataDTO> gerarEvolucaoFaturamento(List<Pedido> pedidos, String periodoNormalizado, IntervaloDatas intervalo) {
 
-        if (periodo.equals("HOJE") || periodo.contains("SEMANA")) {
-            return pedidos.stream()
-                    .collect(Collectors.groupingBy(
-                            p -> traduzirDiaSemana(p.getDataSolicitacao().getDayOfWeek()),
-                            TreeMap::new,
-                            Collectors.mapping(Pedido::getValorTotal, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
-                    ))
-                    .entrySet().stream()
-                    .map(e -> new ChartDataDTO(e.getKey(), e.getValue()))
-                    .toList();
+        Map<String, BigDecimal> faturamentoAgrupado = new LinkedHashMap<>();
+
+        switch (periodoNormalizado) {
+            case "HOJE":
+                String labelHoje = LocalDate.now().getDayOfMonth() + "/" + traduzirMes(LocalDate.now().getMonth());
+                faturamentoAgrupado.put(labelHoje, BigDecimal.ZERO);
+
+                for (Pedido p : pedidos) {
+                    faturamentoAgrupado.put(labelHoje, faturamentoAgrupado.get(labelHoje).add(p.getValorTotal()));
+                }
+                break;
+
+            case "ESTA_SEMANA":
+            case "SEMANA_PASSADA":
+                faturamentoAgrupado.put("Seg", BigDecimal.ZERO);
+                faturamentoAgrupado.put("Ter", BigDecimal.ZERO);
+                faturamentoAgrupado.put("Qua", BigDecimal.ZERO);
+                faturamentoAgrupado.put("Qui", BigDecimal.ZERO);
+                faturamentoAgrupado.put("Sex", BigDecimal.ZERO);
+                faturamentoAgrupado.put("Sáb", BigDecimal.ZERO);
+                faturamentoAgrupado.put("Dom", BigDecimal.ZERO);
+
+                for (Pedido p : pedidos) {
+                    String diaSemana = traduzirDiaSemana(p.getDataSolicitacao().getDayOfWeek());
+                    faturamentoAgrupado.put(diaSemana, faturamentoAgrupado.get(diaSemana).add(p.getValorTotal()));
+                }
+                break;
+
+            case "ESTE_MES":
+            case "MES_PASSADO":
+                faturamentoAgrupado.put("Semana 1", BigDecimal.ZERO);
+                faturamentoAgrupado.put("Semana 2", BigDecimal.ZERO);
+                faturamentoAgrupado.put("Semana 3", BigDecimal.ZERO);
+                faturamentoAgrupado.put("Semana 4", BigDecimal.ZERO);
+                faturamentoAgrupado.put("Semana 5", BigDecimal.ZERO);
+
+                for (Pedido p : pedidos) {
+                    int diaDoMes = p.getDataSolicitacao().getDayOfMonth();
+                    int numSemana = ((diaDoMes - 1) / 7) + 1;
+                    if (numSemana > 5) numSemana = 5;
+
+                    String keySemana = "Semana " + numSemana;
+                    faturamentoAgrupado.put(keySemana, faturamentoAgrupado.get(keySemana).add(p.getValorTotal()));
+                }
+                break;
+
+            case "ANO":
+                for (java.time.Month m : java.time.Month.values()) {
+                    faturamentoAgrupado.put(traduzirMes(m), BigDecimal.ZERO);
+                }
+
+                for (Pedido p : pedidos) {
+                    String mesNome = traduzirMes(p.getDataSolicitacao().getMonth());
+                    faturamentoAgrupado.put(mesNome, faturamentoAgrupado.get(mesNome).add(p.getValorTotal()));
+                }
+                break;
+
+            default:
+                for (Pedido p : pedidos) {
+                    String dataLabel = p.getDataSolicitacao().toString();
+                    faturamentoAgrupado.put(dataLabel, faturamentoAgrupado.getOrDefault(dataLabel, BigDecimal.ZERO).add(p.getValorTotal()));
+                }
+                break;
         }
 
-        if (periodo.contains("MES")) {
-            return pedidos.stream()
-                    .collect(Collectors.groupingBy(
-                            p -> {
-                                int semana = (p.getDataSolicitacao().getDayOfMonth() - 1) / 7 + 1;
-                                return "Semana " + (semana > 4 ? 4 : semana); // Limita a 4 semanas ou ajusta conforme sua regra
-                            },
-                            Collectors.mapping(Pedido::getValorTotal, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
-                    ))
-                    .entrySet().stream()
-                    .map(e -> new ChartDataDTO(e.getKey(), e.getValue()))
-                    .sorted(Comparator.comparing(ChartDataDTO::label))
-                    .toList();
-        }
-
-        return pedidos.stream()
-                .collect(Collectors.groupingBy(
-                        p -> traduzirMes(p.getDataSolicitacao().getMonth()),
-                        Collectors.mapping(Pedido::getValorTotal, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
-                ))
-                .entrySet().stream()
-                .map(e -> new ChartDataDTO(e.getKey(), e.getValue()))
-                .toList();
+        return faturamentoAgrupado.entrySet().stream()
+                .map(entry -> new ChartDataDTO(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toList());
     }
 
     private String traduzirDiaSemana(java.time.DayOfWeek dia) {
@@ -208,5 +238,4 @@ public class ResultadoService {
             case SUNDAY -> "Dom";
         };
     }
-
 }
