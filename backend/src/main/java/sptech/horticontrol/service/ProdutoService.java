@@ -84,7 +84,7 @@ public class ProdutoService {
 
         return produtoRepository.findByNomeContainingIgnoreCase(nome)
                 .stream()
-                .map(p -> new ProdutoResponseDTO(p.getId(), p.getNome(), p.getPreco(), p.getTipoEmbalagem(), p.getTipoProduto()))
+                .map(this::converterParaResponse)
                 .collect(Collectors.toList());
 
     }
