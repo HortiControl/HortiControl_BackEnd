@@ -23,7 +23,8 @@ public class ResultadoService {
 
     public ResultadosResponseDTO gerarResultados(String periodo) {
 
-        IntervaloDatas intervalo = calcularIntervalo(periodo);
+        String periodoUpper = periodo.toUpperCase();
+        IntervaloDatas intervalo = calcularIntervalo(periodoUpper);
 
         List<Pedido> pedidos = pedidoRepository.findByDataSolicitacaoBetween(
                 intervalo.inicio(),
@@ -61,19 +62,7 @@ public class ResultadoService {
                 .sorted(Comparator.comparing(RankingProdutoDTO::quantidadeVendida).reversed())
                 .limit(4).toList();
 
-        List<ChartDataDTO> evolucao = pedidos.stream()
-                .collect(Collectors.groupingBy(
-                        Pedido::getDataSolicitacao,
-                        TreeMap::new,
-                        Collectors.mapping(Pedido::getValorTotal,
-                                Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
-                ))
-                .entrySet().stream()
-                .map(entry -> new ChartDataDTO(
-                        entry.getKey().toString(),
-                        entry.getValue()
-                ))
-                .toList();
+        List<ChartDataDTO> evolucao = gerarEvolucaoFaturamento(pedidos, periodoUpper, intervalo);
 
         List<HistoricoEmbalagemDTO> historico = gerarHistoricoAnual();
 
@@ -100,7 +89,11 @@ public class ResultadoService {
 
         LocalDate hoje = LocalDate.now();
 
-        return switch (periodo.toUpperCase()) {
+        String periodoNormalizado = periodo.toUpperCase()
+                .replace(" ", "_")
+                .replace("Ê", "E");
+
+        return switch (periodoNormalizado) {
             case "HOJE" -> new IntervaloDatas(hoje, hoje);
 
             case "ESTA_SEMANA" -> new IntervaloDatas(hoje.minusDays(hoje.getDayOfWeek().getValue() - 1), hoje);
@@ -120,7 +113,7 @@ public class ResultadoService {
 
             case "ANO" -> new IntervaloDatas(hoje.withDayOfYear(1), hoje);
 
-            default -> // Padrão 30 dias
+            default ->
                     new IntervaloDatas(hoje.minusDays(30), hoje);
         };
     }
@@ -162,6 +155,57 @@ public class ResultadoService {
             case OCTOBER -> "Out";
             case NOVEMBER -> "Nov";
             case DECEMBER -> "Dez";
+        };
+    }
+
+    private List<ChartDataDTO> gerarEvolucaoFaturamento(List<Pedido> pedidos, String periodo, IntervaloDatas intervalo) {
+
+        if (periodo.equals("HOJE") || periodo.contains("SEMANA")) {
+            return pedidos.stream()
+                    .collect(Collectors.groupingBy(
+                            p -> traduzirDiaSemana(p.getDataSolicitacao().getDayOfWeek()),
+                            TreeMap::new,
+                            Collectors.mapping(Pedido::getValorTotal, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
+                    ))
+                    .entrySet().stream()
+                    .map(e -> new ChartDataDTO(e.getKey(), e.getValue()))
+                    .toList();
+        }
+
+        if (periodo.contains("MES")) {
+            return pedidos.stream()
+                    .collect(Collectors.groupingBy(
+                            p -> {
+                                int semana = (p.getDataSolicitacao().getDayOfMonth() - 1) / 7 + 1;
+                                return "Semana " + (semana > 4 ? 4 : semana); // Limita a 4 semanas ou ajusta conforme sua regra
+                            },
+                            Collectors.mapping(Pedido::getValorTotal, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
+                    ))
+                    .entrySet().stream()
+                    .map(e -> new ChartDataDTO(e.getKey(), e.getValue()))
+                    .sorted(Comparator.comparing(ChartDataDTO::label))
+                    .toList();
+        }
+
+        return pedidos.stream()
+                .collect(Collectors.groupingBy(
+                        p -> traduzirMes(p.getDataSolicitacao().getMonth()),
+                        Collectors.mapping(Pedido::getValorTotal, Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
+                ))
+                .entrySet().stream()
+                .map(e -> new ChartDataDTO(e.getKey(), e.getValue()))
+                .toList();
+    }
+
+    private String traduzirDiaSemana(java.time.DayOfWeek dia) {
+        return switch (dia) {
+            case MONDAY -> "Seg";
+            case TUESDAY -> "Ter";
+            case WEDNESDAY -> "Qua";
+            case THURSDAY -> "Qui";
+            case FRIDAY -> "Sex";
+            case SATURDAY -> "Sáb";
+            case SUNDAY -> "Dom";
         };
     }
 
