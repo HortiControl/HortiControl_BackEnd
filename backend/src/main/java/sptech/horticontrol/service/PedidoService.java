@@ -147,9 +147,13 @@ public class PedidoService {
             throw new RecursoNaoEncontradoException("Item não encontrado no pedido");
         }
 
+        if (pedido.getItens().isEmpty()) {
+            pedidoRepository.delete(pedido);
+            return;
+        }
+
         pedido.setValorTotal(calcularValorTotal(pedido.getItens()));
         pedidoRepository.save(pedido);
-
     }
 
     private List<ItemPedido> processarItens(List<ItemPedidoRequestDTO> itensDto, Pedido pedido) {
