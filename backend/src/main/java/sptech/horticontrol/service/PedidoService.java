@@ -190,7 +190,9 @@ public class PedidoService {
         MercadoResponseDTO mercado = new MercadoResponseDTO(
                 p.getMercado().getId(),
                 p.getMercado().getNome(),
-                p.getMercado().getTipoMercado()
+                p.getMercado().getTipoMercado(),
+                p.getMercado().getCep(),
+                p.getMercado().getNumero()
         );
 
         List<ItemPedidoResponseDTO> itens = p.getItens().stream()
@@ -201,7 +203,8 @@ public class PedidoService {
                         i.getQuantidade(),
                         i.getPrecoUnitario(),
                         i.getSubTotal()
-                )).collect(Collectors.toList());
+                ))
+                .collect(Collectors.toList());
 
         return new PedidoResponseDTO(
                 p.getId(),

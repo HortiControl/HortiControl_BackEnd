@@ -73,8 +73,7 @@ public class MercadoController {
     @GetMapping("/consignados")
     public ResponseEntity<List<MercadoResponseDTO>> listarConsignados () {
 
-        List<MercadoResponseDTO> lista = mercadoService.MercadosConsignados();
-
+        List<MercadoResponseDTO> lista = mercadoService.mercadosConsignados();
         if (lista.isEmpty()) {
             return ResponseEntity.status(204).build();
         } else {
@@ -94,7 +93,7 @@ public class MercadoController {
     @GetMapping("/normais")
     public ResponseEntity<List<MercadoResponseDTO>> listarNormais () {
 
-        List<MercadoResponseDTO> lista = mercadoService.MercadosNormais();
+        List<MercadoResponseDTO> lista = mercadoService.mercadosNormais();
 
         if (lista.isEmpty()) {
             return ResponseEntity.status(204).build();

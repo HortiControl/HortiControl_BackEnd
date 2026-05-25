@@ -19,13 +19,21 @@ public class Mercado {
     @Enumerated(EnumType.STRING)
     private TipoMercado tipoMercado;
 
+    @Column(name = "cep", length = 9, nullable = false)
+    private String cep;
+
+    @Column(name = "numero", length = 10, nullable = false)
+    private String numero;
+
     public Mercado() {
     }
 
-    public Mercado(Long id, String nome, TipoMercado tipoMercado) {
+    public Mercado(Long id, String nome, TipoMercado tipoMercado, String cep, String numero) {
         this.id = id;
         this.nome = nome;
         this.tipoMercado = tipoMercado;
+        this.cep = cep;
+        this.numero = numero;
     }
 
     public Long getId() {
@@ -52,4 +60,19 @@ public class Mercado {
         this.tipoMercado = tipoMercado;
     }
 
+    public String getCep() {
+        return cep;
+    }
+
+    public void setCep(String cep) {
+        this.cep = cep;
+    }
+
+    public String getNumero() {
+        return numero;
+    }
+
+    public void setNumero(String numero) {
+        this.numero = numero;
+    }
 }

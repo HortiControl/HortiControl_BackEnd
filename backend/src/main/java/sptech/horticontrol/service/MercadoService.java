@@ -25,27 +25,28 @@ public class MercadoService {
         Mercado novoMercado = new Mercado();
         novoMercado.setNome(dto.getNome());
         novoMercado.setTipoMercado(dto.getTipoMercado());
+        novoMercado.setCep(dto.getCep());
+        novoMercado.setNumero(dto.getNumero());
 
-        return converterParaResponse(mercadoRepository.save(novoMercado));
-
+        Mercado salvo = mercadoRepository.save(novoMercado);
+        return converterParaResponse(salvo);
     }
 
     public List<MercadoResponseDTO> listarMercados() {
-
-        return mercadoRepository.findAll().stream()
+        return mercadoRepository.findAll()
+                .stream()
                 .map(this::converterParaResponse)
                 .collect(Collectors.toList());
-
     }
 
-    public List<MercadoResponseDTO> MercadosConsignados() {
+    public List<MercadoResponseDTO> mercadosConsignados() {
         return mercadoRepository.findByTipoMercado(TipoMercado.CONSIGNADO)
                 .stream()
                 .map(this::converterParaResponse)
                 .collect(Collectors.toList());
     }
 
-    public List<MercadoResponseDTO> MercadosNormais() {
+    public List<MercadoResponseDTO> mercadosNormais() {
         return mercadoRepository.findByTipoMercado(TipoMercado.NORMAL)
                 .stream()
                 .map(this::converterParaResponse)
@@ -59,23 +60,27 @@ public class MercadoService {
 
         mercadoExistente.setNome(dto.getNome());
         mercadoExistente.setTipoMercado(dto.getTipoMercado());
+        mercadoExistente.setCep(dto.getCep());
+        mercadoExistente.setNumero(dto.getNumero());
 
-        return converterParaResponse(mercadoRepository.save(mercadoExistente));
+        Mercado atualizado = mercadoRepository.save(mercadoExistente);
+        return converterParaResponse(atualizado);
     }
 
     public void excluirMercado(Long id) {
-
         if (!mercadoRepository.existsById(id)) {
             throw new RecursoNaoEncontradoException("Mercado não encontrado");
         }
-
         mercadoRepository.deleteById(id);
     }
 
     private MercadoResponseDTO converterParaResponse(Mercado m) {
-
-        return new MercadoResponseDTO(m.getId(), m.getNome(), m.getTipoMercado());
-
+        return new MercadoResponseDTO(
+                m.getId(),
+                m.getNome(),
+                m.getTipoMercado(),
+                m.getCep(),
+                m.getNumero()
+        );
     }
-
 }
