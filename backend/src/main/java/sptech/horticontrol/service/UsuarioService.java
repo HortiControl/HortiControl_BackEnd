@@ -11,6 +11,7 @@ import sptech.horticontrol.exceptions.RegraNegocioException;
 import sptech.horticontrol.repository.UsuarioRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UsuarioService {
@@ -25,6 +26,13 @@ public class UsuarioService {
 
     // Cadastra um novo usuário com a senha em hash BCrypt — NUNCA em texto puro
     public Usuario cadastrar(Usuario usuario) {
+
+        Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(usuario.getEmail());
+
+        if (usuarioExistente.isPresent() && !usuarioExistente.get().getIdUsuario().equals(usuario.getIdUsuario())) {
+            throw new IllegalArgumentException("Este e-mail já está em uso.");
+        }
+
         usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
         return usuarioRepository.save(usuario);
     }
