@@ -27,10 +27,8 @@ public class UsuarioService {
     // Cadastra um novo usuário com a senha em hash BCrypt — NUNCA em texto puro
     public Usuario cadastrar(Usuario usuario) {
 
-        Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(usuario.getEmail());
-
-        if (usuarioExistente.isPresent() && !usuarioExistente.get().getIdUsuario().equals(usuario.getIdUsuario())) {
-            throw new IllegalArgumentException("Este e-mail já está em uso.");
+        if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
+            throw new RegraNegocioException("Este e-mail já está em uso.");
         }
 
         usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
@@ -57,6 +55,12 @@ public class UsuarioService {
 
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
+
+        Optional<Usuario> usuarioExistente = usuarioRepository.findByEmail(dto.getEmail());
+
+        if (usuarioExistente.isPresent() && !usuarioExistente.get().getIdUsuario().equals(id)) {
+            throw new RegraNegocioException("Este e-mail já está em uso por outro usuário.");
+        }
 
         usuario.setNome(dto.getNome());
         usuario.setEmail(dto.getEmail());
