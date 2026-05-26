@@ -18,8 +18,8 @@ public class UsuarioPerfilRequestDTO {
     @Schema(example = "maria@email.com", description = "Email do usuário")
     private String email;
 
-    @NotBlank(message = "telefone é obrigatório")
-    @Pattern(regexp = "\\d{10,11}", message = "telefone deve ter 10 ou 11 dígitos")
+
+    @Pattern(regexp = "^$|\\d{10,11}", message = "telefone deve ter 10 ou 11 dígitos")
     @Schema(example = "11999998888", description = "Telefone do usuário")
     private String telefone;
 
