@@ -36,14 +36,14 @@ class MercadoServiceTest {
         dto.setNome("Mercado MJ4");
         dto.setTipoMercado(TipoMercado.NORMAL);
         dto.setCep("01234-567");
-        dto.setNumero(100);
+        dto.setNumero("100");
 
         Mercado mercadoSalvo = new Mercado();
         mercadoSalvo.setId(1L);
         mercadoSalvo.setNome("Mercado MJ4");
         mercadoSalvo.setTipoMercado(TipoMercado.NORMAL);
         mercadoSalvo.setCep("01234-567");
-        mercadoSalvo.setNumero(100);
+        mercadoSalvo.setNumero("100");
 
         when(mercadoRepository.save(any(Mercado.class)))
                 .thenReturn(mercadoSalvo);
@@ -70,7 +70,7 @@ class MercadoServiceTest {
         List<MercadoResponseDTO> resultado = mercadoService.listarMercados();
 
         assertEquals(1, resultado.size());
-        assertEquals("Mercado MJ4", resultado.get(0).getNome());
+        assertEquals("Mercado MJ4", resultado.getFirst().getNome());
 
         verify(mercadoRepository, times(1)).findAll();
     }
@@ -90,7 +90,7 @@ class MercadoServiceTest {
         List<MercadoResponseDTO> resultado = mercadoService.mercadosConsignados();
 
         assertEquals(1, resultado.size());
-        assertEquals(TipoMercado.CONSIGNADO, resultado.get(0).getTipoMercado());
+        assertEquals(TipoMercado.CONSIGNADO, resultado.getFirst().getTipoMercado());
 
         verify(mercadoRepository).findByTipoMercado(TipoMercado.CONSIGNADO);
     }
@@ -110,7 +110,7 @@ class MercadoServiceTest {
         List<MercadoResponseDTO> resultado = mercadoService.mercadosNormais();
 
         assertEquals(1, resultado.size());
-        assertEquals(TipoMercado.NORMAL, resultado.get(0).getTipoMercado());
+        assertEquals(TipoMercado.NORMAL, resultado.getFirst().getTipoMercado());
 
         verify(mercadoRepository).findByTipoMercado(TipoMercado.NORMAL);
     }

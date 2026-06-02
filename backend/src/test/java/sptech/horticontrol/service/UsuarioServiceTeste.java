@@ -76,7 +76,7 @@ class UsuarioServiceTest {
 
         Long id = 1L;
         Usuario u = new Usuario();
-        u.setIdUsuario(id);
+        u.setId(id);
         u.setNome("Maria");
 
         when(usuarioRepository.findById(id)).thenReturn(Optional.of(u));
@@ -110,7 +110,7 @@ class UsuarioServiceTest {
         Long id = 1L;
 
         Usuario usuario = new Usuario();
-        usuario.setIdUsuario(id);
+        usuario.setId(id);
         usuario.setNome("Nome Antigo");
 
         UsuarioPerfilRequestDTO dto = new UsuarioPerfilRequestDTO();
@@ -136,7 +136,7 @@ class UsuarioServiceTest {
 
         Long id = 1L;
         Usuario usuario = new Usuario();
-        usuario.setIdUsuario(id);
+        usuario.setId(id);
         usuario.setSenha("senha_hash_antiga");
 
         UsuarioSenhaRequestDTO dto = new UsuarioSenhaRequestDTO();
@@ -192,13 +192,13 @@ class UsuarioServiceTest {
 
         Long id = 1L;
         Usuario usuario = new Usuario();
-        usuario.setIdUsuario(id);
+        usuario.setId(id);
 
         UsuarioPerfilRequestDTO dto = new UsuarioPerfilRequestDTO();
         dto.setEmail("outro@email.com");
 
         Usuario outroUsuario = new Usuario();
-        outroUsuario.setIdUsuario(2L); // ID diferente significa que é de outra pessoa
+        outroUsuario.setId(2L); // ID diferente significa que é de outra pessoa
 
         when(usuarioRepository.findById(id)).thenReturn(Optional.of(usuario));
         when(usuarioRepository.findByEmail(dto.getEmail())).thenReturn(Optional.of(outroUsuario));

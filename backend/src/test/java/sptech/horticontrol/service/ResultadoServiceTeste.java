@@ -49,25 +49,33 @@ class ResultadoServiceTest {
         item.setProduto(produto);
         item.setQuantidade(10);
 
+        LocalDate hoje = LocalDate.now();
+        int anoAtual = hoje.getYear();
+
         Pedido pedido = new Pedido();
         pedido.setMercado(mercado);
         pedido.setValorTotal(new BigDecimal("150.00"));
-        pedido.setDataSolicitacao(LocalDate.now());
+        pedido.setDataSolicitacao(hoje);
         pedido.setItens(List.of(item));
 
-        when(pedidoRepository.findByDataSolicitacaoBetween(any(LocalDate.class), any(LocalDate.class)))
+        when(pedidoRepository.findByDataSolicitacaoBetween(hoje, hoje))
                 .thenReturn(List.of(pedido));
+
+        when(pedidoRepository.findByDataSolicitacaoBetween(
+                LocalDate.of(anoAtual, 1, 1),
+                LocalDate.of(anoAtual, 12, 31)
+        )).thenReturn(List.of(pedido));
 
         ResultadosResponseDTO resultado = resultadoService.gerarResultados("HOJE");
 
         assertNotNull(resultado);
-        assertEquals(new BigDecimal("150.00"), resultado.getFaturado());
-        assertEquals(1L, resultado.getQuantidadePedidos());
-        assertEquals(10, resultado.getEmbalagensVendidas().getBandejas());
-        assertEquals(1, resultado.getRankingClientes().size());
-        assertEquals(1, resultado.getRankingProdutos().size());
+        assertEquals(new BigDecimal("150.00"), resultado.faturadoTotal());
+        assertEquals(1L, resultado.totalPedidos());
+        assertEquals(10, resultado.consumoEmbalagens().bandejas());
+        assertEquals(1, resultado.melhoresClientes().size());
+        assertEquals(1, resultado.produtosMaisVendidos().size());
 
-        verify(pedidoRepository).findByDataSolicitacaoBetween(any(LocalDate.class), any(LocalDate.class));
+        verify(pedidoRepository, times(2)).findByDataSolicitacaoBetween(any(LocalDate.class), any(LocalDate.class));
     }
 
     // Testando o comportamento quando não há nenhum pedido
@@ -80,11 +88,11 @@ class ResultadoServiceTest {
         ResultadosResponseDTO resultado = resultadoService.gerarResultados("ESTE_MES");
 
         assertNotNull(resultado);
-        assertEquals(BigDecimal.ZERO, resultado.getFaturado());
-        assertEquals(0L, resultado.getQuantidadePedidos());
-        assertEquals(0, resultado.getEmbalagensVendidas().getBandejas());
-        assertTrue(resultado.getRankingClientes().isEmpty());
-        assertTrue(resultado.getRankingProdutos().isEmpty());
+        assertEquals(BigDecimal.ZERO, resultado.faturadoTotal());
+        assertEquals(0L, resultado.totalPedidos());
+        assertEquals(0, resultado.consumoEmbalagens().bandejas());
+        assertTrue(resultado.melhoresClientes().isEmpty());
+        assertTrue(resultado.produtosMaisVendidos().isEmpty());
     }
 
     // Testando a inteligência da escolha de intervalo pelo switch case
@@ -99,8 +107,8 @@ class ResultadoServiceTest {
 
         assertNotNull(resultado);
         // Garante que pelo menos o gráfico de evolução criou os 12 meses, mesmo sem pedidos
-        assertEquals(12, resultado.getEvolucao().size()); 
-        assertEquals("Jan", resultado.getEvolucao().get(0).getPeriodo());
+        assertEquals(12, resultado.evolucaoFaturamento().size());
+        assertEquals("Jan", resultado.evolucaoFaturamento().getFirst().label());
 
         verify(pedidoRepository, times(2)).findByDataSolicitacaoBetween(any(), any());
     }
@@ -116,6 +124,6 @@ class ResultadoServiceTest {
         ResultadosResponseDTO resultado = resultadoService.gerarResultados("TEXTO_ALEATORIO");
 
         assertNotNull(resultado);
-        assertEquals(BigDecimal.ZERO, resultado.getFaturado());
+        assertEquals(BigDecimal.ZERO, resultado.faturadoTotal());
     }
 }
