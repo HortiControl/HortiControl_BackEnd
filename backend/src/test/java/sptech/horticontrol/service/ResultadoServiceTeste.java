@@ -78,7 +78,7 @@ class ResultadoServiceTest {
         verify(pedidoRepository, times(2)).findByDataSolicitacaoBetween(any(LocalDate.class), any(LocalDate.class));
     }
 
-    // Testando o comportamento quando não há nenhum pedido
+    // Testando o comportamento quando não há nenhum pedido — usa EsteMesStrategy internamente
     @Test
     void deveGerarResultadosZeradosQuandoNaoHouverPedidos() {
 
@@ -95,7 +95,7 @@ class ResultadoServiceTest {
         assertTrue(resultado.produtosMaisVendidos().isEmpty());
     }
 
-    // Testando a inteligência da escolha de intervalo pelo switch case
+    // Testando a seleção da AnoStrategy pelo mapa de estratégias
     @Test
     void deveGerarResultadosParaAnoInteiro() {
 
@@ -113,7 +113,7 @@ class ResultadoServiceTest {
         verify(pedidoRepository, times(2)).findByDataSolicitacaoBetween(any(), any());
     }
 
-    // Testando o fallback (default) do switch de datas
+    // Testando o fallback (DefaultStrategy) quando o período não é reconhecido
     @Test
     void deveGerarResultadosComPeriodoDefault() {
 
