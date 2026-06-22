@@ -61,7 +61,7 @@ public class SecurityConfig {
         // Coloque aqui a URL exata do seu Front-end
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "https://horti-control-front-d10brag6w-horticontrol-teste.vercel.app" // <--- ADICIONE AQUI A URL DO SEU FRONTEND NO VERCEL
+                "https://horti-control-front-end.vercel.app" // <--- ADICIONE AQUI A URL DO SEU FRONTEND NO VERCEL
         ));
         // Métodos HTTP permitidos
         configuration.setAllowedMethods(
