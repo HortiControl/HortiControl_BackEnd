@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,6 +19,7 @@ import sptech.horticontrol.dtos.response.LoginResponseDTO;
 import sptech.horticontrol.dtos.response.UsuarioResponseDTO;
 import sptech.horticontrol.entity.Usuario;
 import sptech.horticontrol.security.JwtService;
+import sptech.horticontrol.security.TokenBlocklistService;
 import sptech.horticontrol.service.UsuarioService;
 
 import java.util.List;
@@ -30,13 +32,16 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final TokenBlocklistService tokenBlocklistService; // usado para revogar o token no logout
 
     public UsuarioController(UsuarioService usuarioService,
                              JwtService jwtService,
-                             AuthenticationManager authenticationManager) {
+                             AuthenticationManager authenticationManager,
+                             TokenBlocklistService tokenBlocklistService) {
         this.usuarioService = usuarioService;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        this.tokenBlocklistService = tokenBlocklistService;
     }
 
     @Operation(
@@ -100,14 +105,21 @@ public class UsuarioController {
     }
 
     // GET /usuarios/logout
+    // agora revoga o token de fato no servidor, adicionando-o à blocklist
     @GetMapping("/logout")
     @Operation(
             summary = "Logout",
-            description = "Encerra a sessão do usuário. O frontend deve descartar o token JWT.",
+            description = "Revoga o token JWT atual no servidor, impedindo seu reuso mesmo antes da expiração natural.",
             security = @SecurityRequirement(name = "bearerAuth")
     )
     @ApiResponse(responseCode = "200", description = "Logout realizado com sucesso")
-    public ResponseEntity<String> logout() {
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+
+        if (header != null && header.startsWith("Bearer ")) {
+            tokenBlocklistService.revogar(header.substring(7));
+        }
+
         return ResponseEntity.ok("Logout realizado com sucesso!!");
     }
 
