@@ -4,33 +4,55 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 public class LoginResponseDTO {
 
-    @Schema(description = "Token do usuário")
-    private String token;
-
-    @Schema(description = "ID do Usuário", example = "1")
-    private Long idUsuario;
+    private Long id;
+    private String nome;
+    private String email;
+    private String telefone;
 
     public LoginResponseDTO() {
     }
 
-    public LoginResponseDTO(String token, Long idUsuario) {
-        this.token = token;
-        this.idUsuario = idUsuario;
+    public LoginResponseDTO(
+            Long id,
+            String nome,
+            String email,
+            String telefone) {
+
+        this.id = id;
+        this.nome = nome;
+        this.email = email;
+        this.telefone = telefone;
     }
 
-    public String getToken() {
-        return token;
+    public Long getId() {
+        return id;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public Long getIdUsuario() {
-        return idUsuario;
+    public String getNome() {
+        return nome;
     }
 
-    public void setIdUsuario(Long idUsuario) {
-        this.idUsuario = idUsuario;
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(String telefone) {
+        this.telefone = telefone;
     }
 }

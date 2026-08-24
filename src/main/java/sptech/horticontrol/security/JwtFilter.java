@@ -1,19 +1,22 @@
 package sptech.horticontrol.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 
 // Filtro executado UMA VEZ por requisição.
 // Lê o token JWT do header Authorization e, se válido,
@@ -23,68 +26,146 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService; // carrega o usuário do banco
-    private final TokenBlocklistService tokenBlocklistService; //guarda tokens revogados via logout
+    private final UserDetailsService userDetailsService;
+    private final TokenBlocklistService tokenBlocklistService;
+    private final AuthCookieService authCookieService;
 
+    public JwtFilter(
+            JwtService jwtService,
+            UserDetailsService userDetailsService,
+            TokenBlocklistService tokenBlocklistService,
+            AuthCookieService authCookieService) {
 
-    public JwtFilter(JwtService jwtService, UserDetailsService userDetailsService, TokenBlocklistService tokenBlocklistService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
-        this.tokenBlocklistService = tokenBlocklistService;
+        this.tokenBlocklistService =
+                tokenBlocklistService;
+        this.authCookieService =
+                authCookieService;
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain)
             throws ServletException, IOException {
 
-        String path = request.getServletPath();
-        String method = request.getMethod(); // 🔥 Pega o método (GET, POST, etc)
+        /*
+         * Procura o JWT exclusivamente no cookie.
+         *
+         * Não existe fallback para Authorization Bearer.
+         */
+        String token =
+                authCookieService.extrairToken(request);
 
-        //IGNORA SWAGGER (DEV)
-        if (path.startsWith("/swagger-ui")
-                || path.startsWith("/v3/api-docs")
-                || path.equals("/swagger-ui.html")) {
+        /*
+         * Só tenta autenticar quando:
+         *
+         * 1. Existe JWT.
+         * 2. A requisição ainda não foi autenticada.
+         */
+        if (token != null
+                && SecurityContextHolder
+                .getContext()
+                .getAuthentication() == null) {
 
-            filterChain.doFilter(request, response);
-            return;
-        }
+            try {
+                /*
+                 * Valida assinatura, algoritmo,
+                 * emissor, audiência e datas.
+                 */
+                Claims claims =
+                        jwtService
+                                .validarEObterClaims(token);
 
-// Ignora se for o Login, OU se for um POST para criar usuário
-        if (path.equals("/usuarios/login") || (path.equals("/usuarios") && method.equals("POST"))) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+                /*
+                 * Verifica se o JWT foi revogado.
+                 */
+                if (!tokenBlocklistService
+                        .estaRevogado(claims.getId())) {
 
-        String header = request.getHeader("Authorization");
+                    /*
+                     * Busca o usuário no banco.
+                     *
+                     * Um JWT válido não deve autenticar
+                     * um usuário que já foi excluído.
+                     */
+                    UserDetails userDetails =
+                            userDetailsService
+                                    .loadUserByUsername(
+                                            claims.getSubject()
+                                    );
 
-        if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
-
-            // Se o token foi revogado (logout), rejeita antes de validar qualquer coisa
-            if (tokenBlocklistService.estaRevogado(token)) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                return;
-            }
-
-            if (jwtService.validarToken(token)) {
-                String email = jwtService.getEmail(token);
-
-                if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-
-                    UsernamePasswordAuthenticationToken auth =
+                    /*
+                     * Objeto utilizado pelo Spring
+                     * para representar uma autenticação.
+                     *
+                     * O segundo parâmetro é null porque
+                     * não precisamos manter a senha.
+                     */
+                    UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
-                                    userDetails, null, userDetails.getAuthorities());
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
 
-                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(auth);
+                    /*
+                     * Adiciona detalhes da requisição,
+                     * como endereço remoto.
+                     */
+                    authentication.setDetails(
+                            new WebAuthenticationDetailsSource()
+                                    .buildDetails(request)
+                    );
+
+                    /*
+                     * Cria um contexto de segurança vazio.
+                     */
+                    SecurityContext context =
+                            SecurityContextHolder
+                                    .createEmptyContext();
+
+                    /*
+                     * Coloca o usuário autenticado
+                     * dentro do contexto.
+                     */
+                    context.setAuthentication(authentication);
+
+                    /*
+                     * Disponibiliza a autenticação para
+                     * o restante da requisição.
+                     */
+                    SecurityContextHolder
+                            .setContext(context);
                 }
+
+            } catch (
+                    JwtException
+                    | IllegalArgumentException
+                    | UsernameNotFoundException ignored) {
+
+                /*
+                 * Não coloca JWTs ou informações internas
+                 * nos logs.
+                 *
+                 * Também não encerra a requisição aqui.
+                 *
+                 * Rotas públicas continuam funcionando.
+                 * Rotas privadas serão recusadas depois
+                 * pela SecurityFilterChain.
+                 */
+                SecurityContextHolder.clearContext();
             }
         }
 
+        /*
+         * Entrega a requisição para o próximo filtro.
+         *
+         * Sem esta linha a requisição não chegaria
+         * aos controllers.
+         */
         filterChain.doFilter(request, response);
     }
 }
