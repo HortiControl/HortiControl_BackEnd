@@ -16,6 +16,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import sptech.horticontrol.security.CookieSecurityProperties;
+import sptech.horticontrol.security.InternalApiKeyFilter;
 import sptech.horticontrol.security.JwtFilter;
 
 import java.util.List;
@@ -24,13 +25,16 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final InternalApiKeyFilter internalApiKeyFilter;
     private final CookieSecurityProperties cookieProperties;
 
     public SecurityConfig(
             JwtFilter jwtFilter,
+            InternalApiKeyFilter internalApiKeyFilter,
             CookieSecurityProperties cookieProperties) {
 
         this.jwtFilter = jwtFilter;
+        this.internalApiKeyFilter = internalApiKeyFilter;
         this.cookieProperties = cookieProperties;
     }
     // @Bean informa que o objeto retornado pelo método
@@ -81,10 +85,18 @@ public class SecurityConfig {
 
                 /*
                  * Ativa a proteção CSRF.
+                 *
+                 * As rotas /internal/** ficam de fora: o CSRF protege
+                 * contra requisições disparadas por um navegador
+                 * autenticado, e quem chama essas rotas é outro
+                 * servidor, autorizado pelo InternalApiKeyFilter.
                  */
                 .csrf(csrf -> csrf
                         .csrfTokenRepository(
                                 csrfRepository
+                        )
+                        .ignoringRequestMatchers(
+                                "/internal/**"
                         )
                 )
 
@@ -177,11 +189,28 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/usuarios/logout").permitAll()
 
                         /*
+                         * Comunicação serviço-a-serviço: dispensa o JWT
+                         * de usuário porque a autorização já foi feita
+                         * pelo InternalApiKeyFilter, que barra a
+                         * requisição antes de ela chegar aqui.
+                         */
+                        .requestMatchers("/internal/**").permitAll()
+
+                        /*
                          * Todo o restante exige um JWT válido.
                          */
                         .anyRequest().authenticated()
                 )
 
+
+                /*
+                 * Valida a chave compartilhada nas rotas internas
+                 * antes de qualquer tentativa de autenticação.
+                 */
+                .addFilterBefore(
+                        internalApiKeyFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
 
                 /*
                  * Executa o JwtFilter antes do filtro
@@ -214,7 +243,8 @@ public class SecurityConfig {
                 "Accept",
                 "Content-Type",
                 "X-CSRF-TOKEN",
-                "X-XSRF-TOKEN"
+                "X-XSRF-TOKEN",
+                "Authorization"
         ));
 
         /*

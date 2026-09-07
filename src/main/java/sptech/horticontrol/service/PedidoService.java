@@ -12,6 +12,7 @@ import sptech.horticontrol.entity.ItemPedido;
 import sptech.horticontrol.entity.Mercado;
 import sptech.horticontrol.entity.Pedido;
 import sptech.horticontrol.entity.Produto;
+import sptech.horticontrol.enums.EscopoPedidos;
 import sptech.horticontrol.enums.StatusPedido;
 import sptech.horticontrol.exceptions.RecursoNaoEncontradoException;
 import sptech.horticontrol.exceptions.RegraNegocioException;
@@ -89,6 +90,35 @@ public class PedidoService {
         return pedidosHistorico.stream()
                 .map(this::converterParaResponse)
                 .collect(Collectors.toList());
+    }
+
+    /*
+     * Lista os pedidos conforme o escopo usado pelo microsserviço
+     * de exportação, que trabalha com ATIVOS, HISTORICO e TODOS em
+     * vez das duas listagens separadas da API.
+     *
+     * O switch é exaustivo sobre o enum: se um escopo novo for
+     * criado, o compilador acusa este ponto em vez de o erro
+     * aparecer só em execução.
+     */
+    public List<PedidoResponseDTO> listarPorEscopo(EscopoPedidos escopo, Long mercadoId) {
+
+        EscopoPedidos escopoEfetivo = escopo == null ? EscopoPedidos.TODOS : escopo;
+
+        return switch (escopoEfetivo) {
+
+            case ATIVOS -> listarPedidosAtivos(mercadoId);
+
+            case HISTORICO -> listarHistoricoPedidos(mercadoId);
+
+            case TODOS -> {
+                List<PedidoResponseDTO> todos =
+                        new ArrayList<>(listarPedidosAtivos(mercadoId));
+
+                todos.addAll(listarHistoricoPedidos(mercadoId));
+                yield todos;
+            }
+        };
     }
 
     public void atualizarStatusPedido(Long id, StatusPedido novoStatus) {
