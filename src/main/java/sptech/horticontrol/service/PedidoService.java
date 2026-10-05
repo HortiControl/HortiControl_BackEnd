@@ -42,6 +42,12 @@ public class PedidoService {
         this.mercadoRepository = mercadoRepository;
     }
 
+    /*
+     * @Transactional garante que a leitura do mercado, dos produtos e a
+     * gravação do pedido ocorram em uma única transação/conexão, em vez de
+     * uma transação separada por chamada de repositório.
+     */
+    @Transactional
     public PedidoResponseDTO criarPedido(PedidoRequestDTO dto) {
 
         Mercado mercado = mercadoRepository.findById(dto.getMercadoId())
@@ -125,6 +131,12 @@ public class PedidoService {
         };
     }
 
+    /*
+     * @Transactional garante que a leitura e a gravação do status ocorram
+     * em uma única transação, em vez de duas transações separadas (uma
+     * por chamada de repositório).
+     */
+    @Transactional
     public void atualizarStatusPedido(Long id, StatusPedido novoStatus) {
 
         Pedido pedido = pedidoRepository.findById(id)
@@ -170,6 +182,14 @@ public class PedidoService {
 
     }
 
+    /*
+     * @Transactional é obrigatório aqui: getItens() é uma coleção LAZY.
+     * Sem uma transação abrangendo a leitura do pedido e o acesso aos
+     * itens, essa chamada lançaria LazyInitializationException assim que
+     * o Open Session In View (OSIV) for desabilitado — ver
+     * spring.jpa.open-in-view=false em application.properties.
+     */
+    @Transactional
     public void removerItemDoPedido(Long pedidoId, Long itemId) {
 
         Pedido pedido = pedidoRepository.findById(pedidoId)
