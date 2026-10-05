@@ -1,5 +1,7 @@
 package sptech.horticontrol.exceptions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -14,6 +16,8 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // 404 - Recurso não encontrado
     @ExceptionHandler(RecursoNaoEncontradoException.class)
@@ -73,6 +77,14 @@ public class GlobalExceptionHandler {
     // 500 - erro genérico
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> tratarErroGenerico(Exception ex) {
+
+        /*
+         * Registra a stack trace completa no log do servidor para
+         * diagnóstico. O cliente continua recebendo apenas a mensagem
+         * genérica abaixo — nenhum detalhe da exceção é exposto na
+         * resposta HTTP.
+         */
+        logger.error("Erro não tratado", ex);
 
         Map<String, Object> erro = new HashMap<>();
         erro.put("dataHora", LocalDateTime.now());
