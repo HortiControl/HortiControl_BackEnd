@@ -1,24 +1,37 @@
 package sptech.horticontrol.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sptech.horticontrol.dtos.resultados.*;
 import sptech.horticontrol.entity.Pedido;
-import sptech.horticontrol.enums.TipoEmbalagem;
 import sptech.horticontrol.repository.PedidoRepository;
+import sptech.horticontrol.service.resultado.EmbalagemCalculator;
+import sptech.horticontrol.service.resultado.HistoricoEmbalagemCalculator;
+import sptech.horticontrol.service.resultado.RankingClienteCalculator;
+import sptech.horticontrol.service.resultado.RankingProdutoCalculator;
 import sptech.horticontrol.service.strategy.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.Month;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
 
+/*
+ * Orquestra a geração do relatório de resultados.
+ *
+ * O cálculo de cada métrica (embalagens, ranking de clientes, ranking de
+ * produtos e histórico anual) foi extraído para colaboradores dedicados em
+ * service.resultado. Esta classe apenas define o intervalo de datas (via
+ * PeriodoStrategy), busca os pedidos no repositório e delega cada cálculo
+ * ao colaborador correspondente.
+ */
 @Service
 public class ResultadoService {
 
-    @Autowired
-    private PedidoRepository pedidoRepository;
+    private final PedidoRepository pedidoRepository;
+    private final EmbalagemCalculator embalagemCalculator;
+    private final RankingClienteCalculator rankingClienteCalculator;
+    private final RankingProdutoCalculator rankingProdutoCalculator;
+    private final HistoricoEmbalagemCalculator historicoEmbalagemCalculator;
 
     private final Map<String, PeriodoStrategy> estrategias = Map.of(
             "HOJE",           new HojeStrategy(),
@@ -28,6 +41,20 @@ public class ResultadoService {
             "MES_PASSADO",    new MesPassadoStrategy(),
             "ANO",            new AnoStrategy()
     );
+
+    public ResultadoService(
+            PedidoRepository pedidoRepository,
+            EmbalagemCalculator embalagemCalculator,
+            RankingClienteCalculator rankingClienteCalculator,
+            RankingProdutoCalculator rankingProdutoCalculator,
+            HistoricoEmbalagemCalculator historicoEmbalagemCalculator
+    ) {
+        this.pedidoRepository = pedidoRepository;
+        this.embalagemCalculator = embalagemCalculator;
+        this.rankingClienteCalculator = rankingClienteCalculator;
+        this.rankingProdutoCalculator = rankingProdutoCalculator;
+        this.historicoEmbalagemCalculator = historicoEmbalagemCalculator;
+    }
 
     public ResultadosResponseDTO gerarResultados(String periodo) {
 
@@ -48,32 +75,11 @@ public class ResultadoService {
                 .map(Pedido::getValorTotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        int bandejas = somarPorEmbalagem(pedidos, TipoEmbalagem.BANDEJA);
-        int potes    = somarPorEmbalagem(pedidos, TipoEmbalagem.POTE);
-        int sacos    = somarPorEmbalagem(pedidos, TipoEmbalagem.SACO);
+        EmbalagemDataDTO embalagens = embalagemCalculator.calcular(pedidos);
 
-        List<RankingClienteDTO> rankingClientes = pedidos.stream()
-                .collect(Collectors.groupingBy(Pedido::getMercado))
-                .entrySet().stream()
-                .map(e -> new RankingClienteDTO(
-                        e.getKey().getNome(),
-                        (long) e.getValue().size(),
-                        e.getValue().stream().map(Pedido::getValorTotal).reduce(BigDecimal.ZERO, BigDecimal::add)
-                ))
-                .sorted(Comparator.comparing(RankingClienteDTO::valorTotal).reversed())
-                .limit(4).toList();
+        List<RankingClienteDTO> rankingClientes = rankingClienteCalculator.calcular(pedidos);
 
-        List<RankingProdutoDTO> rankingProdutos = pedidos.stream()
-                .flatMap(p -> p.getItens().stream())
-                .collect(Collectors.groupingBy(item -> item.getProduto()))
-                .entrySet().stream()
-                .map(e -> new RankingProdutoDTO(
-                        e.getKey().getNome(),
-                        e.getKey().getTipoProduto().toString(),
-                        e.getValue().stream().mapToLong(i -> i.getQuantidade()).sum()
-                ))
-                .sorted(Comparator.comparing(RankingProdutoDTO::quantidadeVendida).reversed())
-                .limit(4).toList();
+        List<RankingProdutoDTO> rankingProdutos = rankingProdutoCalculator.calcular(pedidos);
 
         List<ChartDataDTO> evolucao = strategy.gerarEvolucao(pedidos);
 
@@ -82,20 +88,12 @@ public class ResultadoService {
         return new ResultadosResponseDTO(
                 faturado,
                 (long) pedidos.size(),
-                new EmbalagemDataDTO(bandejas, potes, sacos),
+                embalagens,
                 evolucao,
                 rankingClientes,
                 rankingProdutos,
                 historico
         );
-    }
-
-    private int somarPorEmbalagem(List<Pedido> pedidos, TipoEmbalagem tipo) {
-        return pedidos.stream()
-                .flatMap(p -> p.getItens().stream())
-                .filter(i -> i.getProduto().getTipoEmbalagem() == tipo)
-                .mapToInt(i -> i.getQuantidade())
-                .sum();
     }
 
     private List<HistoricoEmbalagemDTO> gerarHistoricoAnual() {
@@ -106,18 +104,6 @@ public class ResultadoService {
                 LocalDate.of(anoAtual, 12, 31)
         );
 
-        var pedidosPorMes = pedidosDoAno.stream()
-                .collect(Collectors.groupingBy(p -> p.getDataSolicitacao().getMonth()));
-
-        return Arrays.stream(Month.values())
-                .map(mes -> {
-                    List<Pedido> pedidosMes = pedidosPorMes.getOrDefault(mes, List.of());
-                    return new HistoricoEmbalagemDTO(
-                            PeriodoHelper.traduzirMes(mes),
-                            somarPorEmbalagem(pedidosMes, TipoEmbalagem.BANDEJA),
-                            somarPorEmbalagem(pedidosMes, TipoEmbalagem.POTE),
-                            somarPorEmbalagem(pedidosMes, TipoEmbalagem.SACO)
-                    );
-                }).toList();
+        return historicoEmbalagemCalculator.gerar(pedidosDoAno);
     }
 }

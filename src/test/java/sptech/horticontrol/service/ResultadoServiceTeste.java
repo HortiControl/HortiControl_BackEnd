@@ -1,8 +1,8 @@
 package sptech.horticontrol.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import sptech.horticontrol.dtos.resultados.ResultadosResponseDTO;
@@ -13,6 +13,10 @@ import sptech.horticontrol.entity.Produto;
 import sptech.horticontrol.enums.TipoEmbalagem;
 import sptech.horticontrol.enums.TipoProduto;
 import sptech.horticontrol.repository.PedidoRepository;
+import sptech.horticontrol.service.resultado.EmbalagemCalculator;
+import sptech.horticontrol.service.resultado.HistoricoEmbalagemCalculator;
+import sptech.horticontrol.service.resultado.RankingClienteCalculator;
+import sptech.horticontrol.service.resultado.RankingProdutoCalculator;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,8 +33,25 @@ class ResultadoServiceTest {
     @Mock
     private PedidoRepository pedidoRepository;
 
-    @InjectMocks
     private ResultadoService resultadoService;
+
+    /*
+     * Os calculadores (EmbalagemCalculator, RankingClienteCalculator, etc.)
+     * são colaboradores "puros" (sem efeitos colaterais nem acesso a
+     * banco), portanto usamos as implementações reais em vez de mocks.
+     */
+    @BeforeEach
+    void montarService() {
+        EmbalagemCalculator embalagemCalculator = new EmbalagemCalculator();
+
+        resultadoService = new ResultadoService(
+                pedidoRepository,
+                embalagemCalculator,
+                new RankingClienteCalculator(),
+                new RankingProdutoCalculator(),
+                new HistoricoEmbalagemCalculator(embalagemCalculator)
+        );
+    }
 
     // public ResultadosResponseDTO gerarResultados(String periodo)
     // Testando o caminho "feliz" com pedidos existentes para não quebrar
