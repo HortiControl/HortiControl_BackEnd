@@ -2,6 +2,7 @@ package sptech.horticontrol.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,6 +25,18 @@ public class GlobalExceptionHandler {
         erro.put("mensagem", ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
+    }
+
+    // 403 - usuário autenticado, mas sem autorização sobre o recurso (ex.: IDOR/BOLA)
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> tratarAcessoNegado(AccessDeniedException ex) {
+
+        Map<String, Object> erro = new HashMap<>();
+        erro.put("dataHora", LocalDateTime.now());
+        erro.put("status", HttpStatus.FORBIDDEN.value());
+        erro.put("mensagem", ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(erro);
     }
 
     // 400 ou 409

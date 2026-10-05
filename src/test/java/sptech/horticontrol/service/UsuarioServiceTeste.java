@@ -55,18 +55,22 @@ class UsuarioServiceTest {
         verify(usuarioRepository).save(any(Usuario.class));
     }
 
-    // public List<Usuario> listarUsuarios()
+    // public List<UsuarioResponseDTO> listarUsuarios()
     @Test
     void deveListarUsuarios() {
 
         Usuario u = new Usuario();
+        u.setId(1L);
         u.setNome("Joao");
+        u.setEmail("joao@horticontrol.com");
+        u.setSenha("senha_criptografada");
 
         when(usuarioRepository.findAll()).thenReturn(List.of(u));
 
-        List<Usuario> resultado = usuarioService.listarUsuarios();
+        List<UsuarioResponseDTO> resultado = usuarioService.listarUsuarios();
 
         assertEquals(1, resultado.size());
+        assertEquals("Joao", resultado.get(0).getNome());
         verify(usuarioRepository).findAll();
     }
 

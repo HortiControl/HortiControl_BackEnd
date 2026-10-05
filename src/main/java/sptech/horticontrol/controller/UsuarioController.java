@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -354,14 +355,14 @@ public class UsuarioController {
     }
 
     /*
-     * Atenção:
+     * Retorna a lista de usuários já convertida para UsuarioResponseDTO.
      *
-     * Esta rota devolve a entidade Usuario diretamente. Caso a entidade
-     * possua o hash da senha como campo serializável, ele poderá aparecer
-     * na resposta.
+     * O hash da senha nunca é incluído na resposta, pois a entidade Usuario
+     * não é mais devolvida diretamente pelo controller.
      *
-     * O recomendado é restringir a rota a administradores e retornar uma
-     * lista de DTOs que não contenham senha.
+     * Observação: este endpoint ainda não possui restrição por papel de
+     * administrador (não há esse conceito implementado no sistema). Qualquer
+     * usuário autenticado pode listar os demais usuários.
      */
     @Operation(
             summary = "Listar usuários",
@@ -376,14 +377,10 @@ public class UsuarioController {
             @ApiResponse(
                     responseCode = "401",
                     description = "Usuário não autenticado"
-            ),
-            @ApiResponse(
-                    responseCode = "403",
-                    description = "Usuário sem permissão administrativa"
             )
     })
     @GetMapping
-    public ResponseEntity<List<Usuario>> listarUsuarios() {
+    public ResponseEntity<List<UsuarioResponseDTO>> listarUsuarios() {
         return ResponseEntity.ok(
                 usuarioService.listarUsuarios()
         );
@@ -427,8 +424,10 @@ public class UsuarioController {
     /*
      * Rota legada baseada em ID.
      *
-     * Ela pode causar IDOR/BOLA se qualquer usuário autenticado puder
-     * modificar o perfil de outro usuário apenas trocando o ID da URL.
+     * Antes de delegar ao service, confirmamos que o ID da URL pertence ao
+     * próprio usuário autenticado. Sem essa verificação, qualquer usuário
+     * autenticado poderia modificar o perfil de outro apenas trocando o ID
+     * (IDOR/BOLA).
      *
      * O frontend corrigido deve usar PUT /usuarios/me/perfil.
      */
@@ -437,11 +436,35 @@ public class UsuarioController {
             description = "Rota legada para atualização de perfil",
             security = @SecurityRequirement(name = "cookieAuth")
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Perfil atualizado"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Usuário sem acesso ao recurso"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Usuário não encontrado"
+            )
+    })
     @PutMapping("/perfil/{id}")
     public ResponseEntity<UsuarioResponseDTO> atualizarPerfil(
             @PathVariable Long id,
-            @RequestBody @Valid UsuarioPerfilRequestDTO dto
+            @RequestBody @Valid UsuarioPerfilRequestDTO dto,
+            Authentication authentication
     ) {
+        Usuario usuarioAutenticado =
+                usuarioService.buscarPorEmail(authentication.getName());
+
+        if (!usuarioAutenticado.getIdUsuario().equals(id)) {
+            throw new AccessDeniedException(
+                    "Você não tem permissão para modificar o perfil de outro usuário."
+            );
+        }
+
         return ResponseEntity.ok(
                 usuarioService.atualizarPerfil(id, dto)
         );

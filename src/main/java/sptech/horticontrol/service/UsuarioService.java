@@ -89,16 +89,20 @@ public class UsuarioService {
     }
 
     /*
-     * Retorna todos os usuários.
+     * Retorna todos os usuários já convertidos para UsuarioResponseDTO.
      *
-     * Atenção: esse método devolve entidades Usuario. Se a entidade permitir
-     * a serialização do campo senha, o hash poderá aparecer na resposta HTTP.
+     * A entidade Usuario nunca é devolvida diretamente pelo controller,
+     * pois isso exporia o hash da senha na resposta HTTP.
      *
-     * O recomendado é restringir essa operação a administradores e retornar
-     * uma lista de UsuarioResponseDTO.
+     * Observação: este endpoint ainda não possui restrição por papel de
+     * administrador (não há esse conceito implementado no sistema). Qualquer
+     * usuário autenticado pode listar os demais usuários.
      */
-    public List<Usuario> listarUsuarios() {
-        return usuarioRepository.findAll();
+    public List<UsuarioResponseDTO> listarUsuarios() {
+        return usuarioRepository.findAll()
+                .stream()
+                .map(this::converterParaResponse)
+                .toList();
     }
 
     /*
