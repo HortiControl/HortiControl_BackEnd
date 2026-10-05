@@ -1,7 +1,6 @@
 package sptech.horticontrol.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,8 +14,11 @@ import sptech.horticontrol.service.ResultadoService;
 @Tag(name = "Resultados", description = "Dados analíticos do sistema")
 public class ResultadoController {
 
-    @Autowired
-    private ResultadoService resultadoService;
+    private final ResultadoService resultadoService;
+
+    public ResultadoController(ResultadoService resultadoService) {
+        this.resultadoService = resultadoService;
+    }
 
     @GetMapping
     public ResponseEntity<ResultadosResponseDTO> retornoDados(

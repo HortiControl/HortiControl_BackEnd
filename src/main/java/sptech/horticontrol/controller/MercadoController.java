@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sptech.horticontrol.dtos.request.MercadoRequestDTO;
@@ -24,8 +23,11 @@ import java.util.List;
 @Tag(name = "Mercados", description = "Endpoints para gerenciamento de mercados")
 public class MercadoController {
 
-    @Autowired
-    private MercadoService mercadoService;
+    private final MercadoService mercadoService;
+
+    public MercadoController(MercadoService mercadoService) {
+        this.mercadoService = mercadoService;
+    }
 
     @Operation(
             summary = "Cadastrar mercado",

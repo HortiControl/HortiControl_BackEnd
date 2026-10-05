@@ -1,7 +1,6 @@
 package sptech.horticontrol.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
 import sptech.horticontrol.dtos.request.MercadoRequestDTO;
 import sptech.horticontrol.dtos.response.MercadoResponseDTO;
 import sptech.horticontrol.dtos.response.ProdutoResponseDTO;
@@ -17,8 +16,11 @@ import java.util.stream.Collectors;
 @Service
 public class MercadoService {
 
-    @Autowired
-    private MercadoRepository mercadoRepository;
+    private final MercadoRepository mercadoRepository;
+
+    public MercadoService(MercadoRepository mercadoRepository) {
+        this.mercadoRepository = mercadoRepository;
+    }
 
     public MercadoResponseDTO criarMercado(MercadoRequestDTO dto) {
 

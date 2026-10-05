@@ -1,6 +1,5 @@
 package sptech.horticontrol.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sptech.horticontrol.dtos.request.ProdutoRequestDTO;
 import sptech.horticontrol.dtos.response.ProdutoResponseDTO;
@@ -17,8 +16,11 @@ import java.util.stream.Collectors;
 @Service
 public class ProdutoService {
 
-    @Autowired
-    private ProdutoRepository produtoRepository;
+    private final ProdutoRepository produtoRepository;
+
+    public ProdutoService(ProdutoRepository produtoRepository) {
+        this.produtoRepository = produtoRepository;
+    }
 
     public ProdutoResponseDTO criarProduto (ProdutoRequestDTO dto) {
 

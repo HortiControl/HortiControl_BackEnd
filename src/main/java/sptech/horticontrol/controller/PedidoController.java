@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sptech.horticontrol.dtos.request.PedidoRequestDTO;
@@ -25,8 +24,11 @@ import java.util.List;
 @Tag(name = "Pedidos", description = "Gerenciamento de pedidos")
 public class PedidoController {
 
-    @Autowired
-    private PedidoService pedidoService;
+    private final PedidoService pedidoService;
+
+    public PedidoController(PedidoService pedidoService) {
+        this.pedidoService = pedidoService;
+    }
 
     @Operation(summary = "Criar pedido", description = "Cria um novo pedido com itens vinculados a um mercado")
     @ApiResponses({@ApiResponse(responseCode = "201", description = "Pedido criado com sucesso", content = @Content(schema = @Schema(implementation = PedidoResponseDTO.class))), @ApiResponse(responseCode = "400", description = "Dados inválidos")})

@@ -1,7 +1,6 @@
 package sptech.horticontrol.service;
 
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sptech.horticontrol.dtos.request.ItemPedidoRequestDTO;
 import sptech.horticontrol.dtos.request.PedidoRequestDTO;
@@ -29,14 +28,19 @@ import java.util.stream.Collectors;
 @Service
 public class PedidoService {
 
-    @Autowired
-    private PedidoRepository pedidoRepository;
+    private final PedidoRepository pedidoRepository;
+    private final ProdutoRepository produtoRepository;
+    private final MercadoRepository mercadoRepository;
 
-    @Autowired
-    private ProdutoRepository produtoRepository;
-
-    @Autowired
-    private MercadoRepository mercadoRepository;
+    public PedidoService(
+            PedidoRepository pedidoRepository,
+            ProdutoRepository produtoRepository,
+            MercadoRepository mercadoRepository
+    ) {
+        this.pedidoRepository = pedidoRepository;
+        this.produtoRepository = produtoRepository;
+        this.mercadoRepository = mercadoRepository;
+    }
 
     public PedidoResponseDTO criarPedido(PedidoRequestDTO dto) {
 
