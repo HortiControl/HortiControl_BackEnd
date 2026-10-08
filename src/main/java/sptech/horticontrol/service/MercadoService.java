@@ -1,17 +1,15 @@
 package sptech.horticontrol.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import sptech.horticontrol.dtos.request.MercadoRequestDTO;
 import sptech.horticontrol.dtos.response.MercadoResponseDTO;
-import sptech.horticontrol.dtos.response.ProdutoResponseDTO;
 import sptech.horticontrol.entity.Mercado;
 import sptech.horticontrol.enums.TipoMercado;
-import sptech.horticontrol.enums.TipoProduto;
 import sptech.horticontrol.exceptions.RecursoNaoEncontradoException;
 import sptech.horticontrol.repository.MercadoRepository;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class MercadoService {
@@ -34,25 +32,19 @@ public class MercadoService {
         return converterParaResponse(salvo);
     }
 
-    public List<MercadoResponseDTO> listarMercados() {
-        return mercadoRepository.findAll()
-                .stream()
-                .map(this::converterParaResponse)
-                .collect(Collectors.toList());
+    public Page<MercadoResponseDTO> listarMercados(Pageable pageable) {
+        return mercadoRepository.findAll(pageable)
+                .map(this::converterParaResponse);
     }
 
-    public List<MercadoResponseDTO> mercadosConsignados() {
-        return mercadoRepository.findByTipoMercado(TipoMercado.CONSIGNADO)
-                .stream()
-                .map(this::converterParaResponse)
-                .collect(Collectors.toList());
+    public Page<MercadoResponseDTO> mercadosConsignados(Pageable pageable) {
+        return mercadoRepository.findByTipoMercado(TipoMercado.CONSIGNADO, pageable)
+                .map(this::converterParaResponse);
     }
 
-    public List<MercadoResponseDTO> mercadosNormais() {
-        return mercadoRepository.findByTipoMercado(TipoMercado.NORMAL)
-                .stream()
-                .map(this::converterParaResponse)
-                .collect(Collectors.toList());
+    public Page<MercadoResponseDTO> mercadosNormais(Pageable pageable) {
+        return mercadoRepository.findByTipoMercado(TipoMercado.NORMAL, pageable)
+                .map(this::converterParaResponse);
     }
 
     public MercadoResponseDTO atualizarMercado(Long id, MercadoRequestDTO dto) {

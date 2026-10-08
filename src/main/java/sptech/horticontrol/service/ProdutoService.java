@@ -1,5 +1,7 @@
 package sptech.horticontrol.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import sptech.horticontrol.dtos.request.ProdutoRequestDTO;
 import sptech.horticontrol.dtos.response.ProdutoResponseDTO;
@@ -11,7 +13,6 @@ import sptech.horticontrol.repository.ProdutoRepository;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ProdutoService {
@@ -35,26 +36,19 @@ public class ProdutoService {
 
     }
 
-    public List<ProdutoResponseDTO> listarProdutos () {
-
-        return produtoRepository.findAll().stream()
-                .map(this::converterParaResponse)
-                .collect(Collectors.toList());
-
+    public Page<ProdutoResponseDTO> listarProdutos(Pageable pageable) {
+        return produtoRepository.findAll(pageable)
+                .map(this::converterParaResponse);
     }
 
-    public List<ProdutoResponseDTO> ProdutosPreLavados() {
-        return produtoRepository.findByTipoProduto(TipoProduto.PRE_LAVADO)
-                .stream()
-                .map(this::converterParaResponse)
-                .collect(Collectors.toList());
+    public Page<ProdutoResponseDTO> produtosPreLavados(Pageable pageable) {
+        return produtoRepository.findByTipoProduto(TipoProduto.PRE_LAVADO, pageable)
+                .map(this::converterParaResponse);
     }
 
-    public List<ProdutoResponseDTO> ProdutosNaoLavados() {
-        return produtoRepository.findByTipoProduto(TipoProduto.NAO_LAVADO)
-                .stream()
-                .map(this::converterParaResponse)
-                .collect(Collectors.toList());
+    public Page<ProdutoResponseDTO> produtosNaoLavados(Pageable pageable) {
+        return produtoRepository.findByTipoProduto(TipoProduto.NAO_LAVADO, pageable)
+                .map(this::converterParaResponse);
     }
 
     public ProdutoResponseDTO atualizarProduto (Long id, ProdutoRequestDTO dto) {
@@ -82,13 +76,9 @@ public class ProdutoService {
 
     }
 
-    public List<ProdutoResponseDTO> buscarProdutoPorNome (String nome) {
-
-        return produtoRepository.findByNomeContainingIgnoreCase(nome)
-                .stream()
-                .map(this::converterParaResponse)
-                .collect(Collectors.toList());
-
+    public Page<ProdutoResponseDTO> buscarProdutoPorNome(String nome, Pageable pageable) {
+        return produtoRepository.findByNomeContainingIgnoreCase(nome, pageable)
+                .map(this::converterParaResponse);
     }
 
     public void reajustarPrecoGlobal (BigDecimal novoPreco) {

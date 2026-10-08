@@ -5,6 +5,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import sptech.horticontrol.dtos.request.ProdutoRequestDTO;
 import sptech.horticontrol.dtos.response.ProdutoResponseDTO;
 import sptech.horticontrol.entity.Produto;
@@ -62,7 +66,7 @@ class ProdutoServiceTest {
                 .save(any(Produto.class));
     }
 
-    // public List<ProdutoResponseDTO> listarProdutos()
+    // public Page<ProdutoResponseDTO> listarProdutos(Pageable pageable)
     @Test
     void deveListarProdutos() {
 
@@ -71,18 +75,19 @@ class ProdutoServiceTest {
         produto.setNome("Tomate");
         produto.setPreco(new BigDecimal("8.00"));
 
-        when(produtoRepository.findAll()).thenReturn(List.of(produto));
+        Pageable pageable = PageRequest.of(0, 10);
+        when(produtoRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(produto)));
 
-        List<ProdutoResponseDTO> resultado = produtoService.listarProdutos();
+        Page<ProdutoResponseDTO> resultado = produtoService.listarProdutos(pageable);
 
-        assertEquals(1, resultado.size());
-        assertEquals("Tomate", resultado.get(0).getNome());
+        assertEquals(1, resultado.getContent().size());
+        assertEquals("Tomate", resultado.getContent().get(0).getNome());
 
         verify(produtoRepository, times(1))
-                .findAll();
+                .findAll(pageable);
     }
 
-    // public List<ProdutoResponseDTO> ProdutosPreLavados()
+    // public Page<ProdutoResponseDTO> produtosPreLavados(Pageable pageable)
     @Test
     void deveListarProdutosPreLavados() {
 
@@ -91,18 +96,19 @@ class ProdutoServiceTest {
         produto.setNome("Alface");
         produto.setTipoProduto(TipoProduto.PRE_LAVADO);
 
-        when(produtoRepository.findByTipoProduto(TipoProduto.PRE_LAVADO))
-                .thenReturn(List.of(produto));
+        Pageable pageable = PageRequest.of(0, 10);
+        when(produtoRepository.findByTipoProduto(TipoProduto.PRE_LAVADO, pageable))
+                .thenReturn(new PageImpl<>(List.of(produto)));
 
-        List<ProdutoResponseDTO> resultado = produtoService.ProdutosPreLavados();
+        Page<ProdutoResponseDTO> resultado = produtoService.produtosPreLavados(pageable);
 
-        assertEquals(1, resultado.size());
-        assertEquals("Alface", resultado.get(0).getNome());
+        assertEquals(1, resultado.getContent().size());
+        assertEquals("Alface", resultado.getContent().get(0).getNome());
 
-        verify(produtoRepository).findByTipoProduto(TipoProduto.PRE_LAVADO);
+        verify(produtoRepository).findByTipoProduto(TipoProduto.PRE_LAVADO, pageable);
     }
 
-    // public List<ProdutoResponseDTO> ProdutosNaoLavados()
+    // public Page<ProdutoResponseDTO> produtosNaoLavados(Pageable pageable)
     @Test
     void deveListarProdutosNaoLavados() {
 
@@ -111,17 +117,19 @@ class ProdutoServiceTest {
         produto.setNome("Cenoura");
         produto.setTipoProduto(TipoProduto.NAO_LAVADO);
 
-        when(produtoRepository.findByTipoProduto(TipoProduto.NAO_LAVADO))
-                .thenReturn(List.of(produto));
+        Pageable pageable = PageRequest.of(0, 10);
+        when(produtoRepository.findByTipoProduto(TipoProduto.NAO_LAVADO, pageable))
+                .thenReturn(new PageImpl<>(List.of(produto)));
 
-        List<ProdutoResponseDTO> resultado =
-                produtoService.ProdutosNaoLavados();
+        Page<ProdutoResponseDTO> resultado =
+                produtoService.produtosNaoLavados(pageable);
 
-        assertEquals(1, resultado.size());
-        assertEquals("Cenoura", resultado.get(0).getNome());
+        assertEquals(1, resultado.getContent().size());
+        assertEquals("Cenoura", resultado.getContent().get(0).getNome());
 
-        verify(produtoRepository).findByTipoProduto(TipoProduto.NAO_LAVADO);
+        verify(produtoRepository).findByTipoProduto(TipoProduto.NAO_LAVADO, pageable);
     }
+
 
     // public ProdutoResponseDTO atualizarProduto (Long id, ProdutoRequestDTO dto)
     @Test
@@ -169,7 +177,7 @@ class ProdutoServiceTest {
         verify(produtoRepository).deleteById(id);
     }
 
-    // public List<ProdutoResponseDTO> buscarProdutoPorNome (String nome)
+    // public Page<ProdutoResponseDTO> buscarProdutoPorNome(String nome, Pageable pageable)
     @Test
     void deveBuscarProdutoPorNome() {
 
@@ -177,17 +185,19 @@ class ProdutoServiceTest {
         produto.setId(1L);
         produto.setNome("Tomate");
 
-        when(produtoRepository.findByNomeContainingIgnoreCase("Tom"))
-                .thenReturn(List.of(produto));
+        Pageable pageable = PageRequest.of(0, 10);
+        when(produtoRepository.findByNomeContainingIgnoreCase("Tom", pageable))
+                .thenReturn(new PageImpl<>(List.of(produto)));
 
-        List<ProdutoResponseDTO> resultado =
-                produtoService.buscarProdutoPorNome("Tom");
+        Page<ProdutoResponseDTO> resultado =
+                produtoService.buscarProdutoPorNome("Tom", pageable);
 
-        assertEquals(1, resultado.size());
-        assertEquals("Tomate", resultado.get(0).getNome());
+        assertEquals(1, resultado.getContent().size());
+        assertEquals("Tomate", resultado.getContent().get(0).getNome());
 
-        verify(produtoRepository).findByNomeContainingIgnoreCase("Tom");
+        verify(produtoRepository).findByNomeContainingIgnoreCase("Tom", pageable);
     }
+
 
     // public void reajustarPrecoGlobal (BigDecimal novoPreco)
     @Test

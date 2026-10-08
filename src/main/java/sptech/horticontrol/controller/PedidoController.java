@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sptech.horticontrol.dtos.request.PedidoRequestDTO;
@@ -16,7 +19,7 @@ import sptech.horticontrol.enums.StatusPedido;
 import sptech.horticontrol.service.PedidoService;
 
 import java.math.BigDecimal;
-import java.util.List;
+
 
 @RestController
 @RequestMapping("/pedidos")
@@ -38,33 +41,38 @@ public class PedidoController {
         return ResponseEntity.status(201).body(novoPedido);
     }
 
-    @Operation(summary = "Listar pedidos ativos", description = "Lista pedidos em andamento, opcionalmente filtrando por mercado")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Lista de pedidos ativos"), @ApiResponse(responseCode = "204", description = "Nenhum pedido ativo encontrado")})
+    @Operation(summary = "Listar pedidos ativos", description = "Lista pedidos em andamento, opcionalmente filtrando por mercado, com paginação")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Página de pedidos ativos"), @ApiResponse(responseCode = "204", description = "Nenhum pedido ativo encontrado")})
     @GetMapping("/ativos")
-    public ResponseEntity<List<PedidoResponseDTO>> listarAtivos(@RequestParam(required = false) Long mercadoId) {
+    public ResponseEntity<Page<PedidoResponseDTO>> listarAtivos(
+            @RequestParam(required = false) Long mercadoId,
+            @PageableDefault(size = 10, sort = "dataSolicitacao") Pageable pageable) {
 
-        List<PedidoResponseDTO> listaAtivos = pedidoService.listarPedidosAtivos(mercadoId);
+        Page<PedidoResponseDTO> paginaAtivos = pedidoService.listarPedidosAtivos(mercadoId, pageable);
 
-        if (listaAtivos.isEmpty()) {
+        if (paginaAtivos.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
 
-        return ResponseEntity.status(200).body(listaAtivos);
+        return ResponseEntity.status(200).body(paginaAtivos);
     }
 
-    @Operation(summary = "Listar histórico de pedidos", description = "Lista pedidos finalizados/cancelados, opcionalmente filtrando por mercado")
-    @ApiResponses({@ApiResponse(responseCode = "200", description = "Histórico de pedidos retornado"), @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado")})
+    @Operation(summary = "Listar histórico de pedidos", description = "Lista pedidos finalizados/cancelados, opcionalmente filtrando por mercado, com paginação")
+    @ApiResponses({@ApiResponse(responseCode = "200", description = "Página de histórico de pedidos"), @ApiResponse(responseCode = "204", description = "Nenhum pedido encontrado")})
     @GetMapping("/historico")
-    public ResponseEntity<List<PedidoResponseDTO>> listarHistorico(@RequestParam(required = false) Long mercadoId) {
+    public ResponseEntity<Page<PedidoResponseDTO>> listarHistorico(
+            @RequestParam(required = false) Long mercadoId,
+            @PageableDefault(size = 10, sort = "dataSolicitacao") Pageable pageable) {
 
-        List<PedidoResponseDTO> historico = pedidoService.listarHistoricoPedidos(mercadoId);
+        Page<PedidoResponseDTO> paginaHistorico = pedidoService.listarHistoricoPedidos(mercadoId, pageable);
 
-        if (historico.isEmpty()) {
+        if (paginaHistorico.isEmpty()) {
             return ResponseEntity.status(204).build();
         }
 
-        return ResponseEntity.status(200).body(historico);
+        return ResponseEntity.status(200).body(paginaHistorico);
     }
+
 
     @Operation(summary = "Atualizar status do pedido", description = "Atualiza o status de um pedido específico")
     @ApiResponses({@ApiResponse(responseCode = "204", description = "Status atualizado com sucesso"), @ApiResponse(responseCode = "404", description = "Pedido não encontrado")})

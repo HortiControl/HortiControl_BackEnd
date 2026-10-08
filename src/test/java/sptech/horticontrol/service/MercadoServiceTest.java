@@ -5,6 +5,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import sptech.horticontrol.dtos.request.MercadoRequestDTO;
 import sptech.horticontrol.dtos.response.MercadoResponseDTO;
 import sptech.horticontrol.entity.Mercado;
@@ -57,7 +61,7 @@ class MercadoServiceTest {
         verify(mercadoRepository, times(1)).save(any(Mercado.class));
     }
 
-    // public List<MercadoResponseDTO> listarMercados()
+    // public Page<MercadoResponseDTO> listarMercados(Pageable pageable)
     @Test
     void deveListarMercados() {
 
@@ -65,17 +69,18 @@ class MercadoServiceTest {
         mercado.setId(1L);
         mercado.setNome("Mercado MJ4");
 
-        when(mercadoRepository.findAll()).thenReturn(List.of(mercado));
+        Pageable pageable = PageRequest.of(0, 10);
+        when(mercadoRepository.findAll(pageable)).thenReturn(new PageImpl<>(List.of(mercado)));
 
-        List<MercadoResponseDTO> resultado = mercadoService.listarMercados();
+        Page<MercadoResponseDTO> resultado = mercadoService.listarMercados(pageable);
 
-        assertEquals(1, resultado.size());
-        assertEquals("Mercado MJ4", resultado.getFirst().getNome());
+        assertEquals(1, resultado.getContent().size());
+        assertEquals("Mercado MJ4", resultado.getContent().getFirst().getNome());
 
-        verify(mercadoRepository, times(1)).findAll();
+        verify(mercadoRepository, times(1)).findAll(pageable);
     }
 
-    // public List<MercadoResponseDTO> mercadosConsignados()
+    // public Page<MercadoResponseDTO> mercadosConsignados(Pageable pageable)
     @Test
     void deveListarMercadosConsignados() {
 
@@ -84,18 +89,19 @@ class MercadoServiceTest {
         mercado.setNome("Mercado Consignado");
         mercado.setTipoMercado(TipoMercado.CONSIGNADO);
 
-        when(mercadoRepository.findByTipoMercado(TipoMercado.CONSIGNADO))
-                .thenReturn(List.of(mercado));
+        Pageable pageable = PageRequest.of(0, 10);
+        when(mercadoRepository.findByTipoMercado(TipoMercado.CONSIGNADO, pageable))
+                .thenReturn(new PageImpl<>(List.of(mercado)));
 
-        List<MercadoResponseDTO> resultado = mercadoService.mercadosConsignados();
+        Page<MercadoResponseDTO> resultado = mercadoService.mercadosConsignados(pageable);
 
-        assertEquals(1, resultado.size());
-        assertEquals(TipoMercado.CONSIGNADO, resultado.getFirst().getTipoMercado());
+        assertEquals(1, resultado.getContent().size());
+        assertEquals(TipoMercado.CONSIGNADO, resultado.getContent().getFirst().getTipoMercado());
 
-        verify(mercadoRepository).findByTipoMercado(TipoMercado.CONSIGNADO);
+        verify(mercadoRepository).findByTipoMercado(TipoMercado.CONSIGNADO, pageable);
     }
 
-    // public List<MercadoResponseDTO> mercadosNormais()
+    // public Page<MercadoResponseDTO> mercadosNormais(Pageable pageable)
     @Test
     void deveListarMercadosNormais() {
 
@@ -104,16 +110,18 @@ class MercadoServiceTest {
         mercado.setNome("Mercado Normal");
         mercado.setTipoMercado(TipoMercado.NORMAL);
 
-        when(mercadoRepository.findByTipoMercado(TipoMercado.NORMAL))
-                .thenReturn(List.of(mercado));
+        Pageable pageable = PageRequest.of(0, 10);
+        when(mercadoRepository.findByTipoMercado(TipoMercado.NORMAL, pageable))
+                .thenReturn(new PageImpl<>(List.of(mercado)));
 
-        List<MercadoResponseDTO> resultado = mercadoService.mercadosNormais();
+        Page<MercadoResponseDTO> resultado = mercadoService.mercadosNormais(pageable);
 
-        assertEquals(1, resultado.size());
-        assertEquals(TipoMercado.NORMAL, resultado.getFirst().getTipoMercado());
+        assertEquals(1, resultado.getContent().size());
+        assertEquals(TipoMercado.NORMAL, resultado.getContent().getFirst().getTipoMercado());
 
-        verify(mercadoRepository).findByTipoMercado(TipoMercado.NORMAL);
+        verify(mercadoRepository).findByTipoMercado(TipoMercado.NORMAL, pageable);
     }
+
 
     // public MercadoResponseDTO atualizarMercado(Long id, MercadoRequestDTO dto)
     @Test

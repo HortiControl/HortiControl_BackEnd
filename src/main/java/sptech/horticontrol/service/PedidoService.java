@@ -1,6 +1,9 @@
 package sptech.horticontrol.service;
 
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import sptech.horticontrol.dtos.request.ItemPedidoRequestDTO;
 import sptech.horticontrol.dtos.request.PedidoRequestDTO;
@@ -23,6 +26,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -100,6 +104,47 @@ public class PedidoService {
         return pedidosHistorico.stream()
                 .map(this::converterParaResponse)
                 .collect(Collectors.toList());
+    }
+
+
+    public Page<PedidoResponseDTO> listarPedidosAtivos(Long mercadoId, Pageable pageable) {
+
+        Page<Long> paginaIds = (mercadoId != null)
+                ? pedidoRepository.findIdsByMercadoIdAndStatusPedido(mercadoId, StatusPedido.ATIVO, pageable)
+                : pedidoRepository.findIdsByStatusPedido(StatusPedido.ATIVO, pageable);
+
+        return montarPaginaDeResponse(paginaIds);
+    }
+
+    public Page<PedidoResponseDTO> listarHistoricoPedidos(Long mercadoId, Pageable pageable) {
+
+        List<StatusPedido> statusFechados = List.of(StatusPedido.CONCLUIDO);
+
+        Page<Long> paginaIds = (mercadoId != null)
+                ? pedidoRepository.findIdsByMercadoIdAndStatusPedidoIn(mercadoId, statusFechados, pageable)
+                : pedidoRepository.findIdsByStatusPedidoIn(statusFechados, pageable);
+
+        return montarPaginaDeResponse(paginaIds);
+    }
+
+    private Page<PedidoResponseDTO> montarPaginaDeResponse(Page<Long> paginaIds) {
+
+        List<Long> ids = paginaIds.getContent();
+
+        if (ids.isEmpty()) {
+            return new PageImpl<>(List.of(), paginaIds.getPageable(), paginaIds.getTotalElements());
+        }
+
+        Map<Long, Pedido> pedidosPorId = pedidoRepository.findByIdInComFetch(ids).stream()
+                .collect(Collectors.toMap(Pedido::getId, p -> p));
+
+        List<PedidoResponseDTO> conteudo = ids.stream()
+                .map(pedidosPorId::get)
+                .filter(java.util.Objects::nonNull)
+                .map(this::converterParaResponse)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(conteudo, paginaIds.getPageable(), paginaIds.getTotalElements());
     }
 
     /*

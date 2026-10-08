@@ -1,5 +1,7 @@
 package sptech.horticontrol.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -78,5 +80,61 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
             @Param("inicio") LocalDate inicio,
             @Param("fim") LocalDate fim
     );
-}
 
+    /*
+     * 1) Busca-se apenas os IDs da página desejada, com uma query simples
+     *    (sem fetch de coleção), o banco aplique
+     *    LIMIT/OFFSET e que o Spring Data gere a contagem
+     *    total (COUNT) para montar o Page<Long>.
+     *
+     * 2) Com a lista de IDs da página, busca-se os pedidos completos (com
+     *    JOIN FETCH de mercado/itens/produto) via WHERE id IN :ids. 
+     */
+
+    @Query("""
+            SELECT p.id FROM Pedido p
+            WHERE p.mercado.id = :mercadoId AND p.statusPedido = :status
+            """)
+    Page<Long> findIdsByMercadoIdAndStatusPedido(
+            @Param("mercadoId") Long mercadoId,
+            @Param("status") StatusPedido status,
+            Pageable pageable
+    );
+
+    @Query("""
+            SELECT p.id FROM Pedido p
+            WHERE p.statusPedido = :status
+            """)
+    Page<Long> findIdsByStatusPedido(
+            @Param("status") StatusPedido status,
+            Pageable pageable
+    );
+
+    @Query("""
+            SELECT p.id FROM Pedido p
+            WHERE p.mercado.id = :mercadoId AND p.statusPedido IN :statuses
+            """)
+    Page<Long> findIdsByMercadoIdAndStatusPedidoIn(
+            @Param("mercadoId") Long mercadoId,
+            @Param("statuses") List<StatusPedido> statuses,
+            Pageable pageable
+    );
+
+    @Query("""
+            SELECT p.id FROM Pedido p
+            WHERE p.statusPedido IN :statuses
+            """)
+    Page<Long> findIdsByStatusPedidoIn(
+            @Param("statuses") List<StatusPedido> statuses,
+            Pageable pageable
+    );
+
+    @Query("""
+            SELECT DISTINCT p FROM Pedido p
+            JOIN FETCH p.mercado
+            LEFT JOIN FETCH p.itens i
+            LEFT JOIN FETCH i.produto
+            WHERE p.id IN :ids
+            """)
+    List<Pedido> findByIdInComFetch(@Param("ids") List<Long> ids);
+}

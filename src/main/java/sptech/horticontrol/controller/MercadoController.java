@@ -8,14 +8,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sptech.horticontrol.dtos.request.MercadoRequestDTO;
 import sptech.horticontrol.dtos.response.MercadoResponseDTO;
-import sptech.horticontrol.dtos.response.ProdutoResponseDTO;
 import sptech.horticontrol.service.MercadoService;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/mercados")
@@ -45,64 +46,68 @@ public class MercadoController {
 
     @Operation(
             summary = "Listar mercados",
-            description = "Retorna todos os mercados cadastrados"
+            description = "Retorna todos os mercados cadastrados, com paginação"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Lista de mercados retornada"),
+            @ApiResponse(responseCode = "200", description = "Página de mercados retornada"),
             @ApiResponse(responseCode = "204", description = "Nenhum mercado encontrado")
     })
     @GetMapping
-    public ResponseEntity<List<MercadoResponseDTO>> listar() {
+    public ResponseEntity<Page<MercadoResponseDTO>> listar(
+            @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
 
-        List<MercadoResponseDTO> listarMercados = mercadoService.listarMercados();
+        Page<MercadoResponseDTO> pagina = mercadoService.listarMercados(pageable);
 
-        if(listarMercados.isEmpty()) {
+        if(pagina.isEmpty()) {
            return ResponseEntity.status(204).build();
         } else {
-            return ResponseEntity.ok(listarMercados);
+            return ResponseEntity.ok(pagina);
         }
     }
 
     @Operation(
             summary = "Listar Mercados Consignados",
-            description = "Retorna todos os mercados Consignado cadastrados"
+            description = "Retorna todos os mercados Consignado cadastrados, com paginação"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Lista de mercados retornada"),
+            @ApiResponse(responseCode = "200", description = "Página de mercados retornada"),
             @ApiResponse(responseCode = "204", description = "Nenhum mercado encontrado")
     })
 
     @GetMapping("/consignados")
-    public ResponseEntity<List<MercadoResponseDTO>> listarConsignados () {
+    public ResponseEntity<Page<MercadoResponseDTO>> listarConsignados(
+            @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
 
-        List<MercadoResponseDTO> lista = mercadoService.mercadosConsignados();
-        if (lista.isEmpty()) {
+        Page<MercadoResponseDTO> pagina = mercadoService.mercadosConsignados(pageable);
+        if (pagina.isEmpty()) {
             return ResponseEntity.status(204).build();
         } else {
-            return ResponseEntity.ok(lista);
+            return ResponseEntity.ok(pagina);
         }
     }
 
     @Operation(
             summary = "Listar Mercados Normais",
-            description = "Retorna todos os mercados Normais cadastrados"
+            description = "Retorna todos os mercados Normais cadastrados, com paginação"
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Lista de mercados retornada"),
+            @ApiResponse(responseCode = "200", description = "Página de mercados retornada"),
             @ApiResponse(responseCode = "204", description = "Nenhum mercado encontrado")
     })
 
     @GetMapping("/normais")
-    public ResponseEntity<List<MercadoResponseDTO>> listarNormais () {
+    public ResponseEntity<Page<MercadoResponseDTO>> listarNormais(
+            @PageableDefault(size = 10, sort = "nome") Pageable pageable) {
 
-        List<MercadoResponseDTO> lista = mercadoService.mercadosNormais();
+        Page<MercadoResponseDTO> pagina = mercadoService.mercadosNormais(pageable);
 
-        if (lista.isEmpty()) {
+        if (pagina.isEmpty()) {
             return ResponseEntity.status(204).build();
         } else {
-            return ResponseEntity.ok(lista);
+            return ResponseEntity.ok(pagina);
         }
     }
+
 
     @Operation(
             summary = "Atualizar mercado",
