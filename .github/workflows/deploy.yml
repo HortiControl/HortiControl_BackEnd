@@ -20,7 +20,7 @@ jobs:
 
       - name: Build e Push da imagem
         run: |
-          docker build -t brucilao/horticontrol-backend:latest.
+          docker build -t brucilao/horticontrol-backend:latest .
           docker push brucilao/horticontrol-backend:latest
 
       - name: Deploy via Bastion
