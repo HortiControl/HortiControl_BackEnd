@@ -102,11 +102,12 @@ public class SecurityConfig {
                  * servidor, autorizado pelo InternalApiKeyFilter.
                  */
                 .csrf(csrf -> csrf
-                        .csrfTokenRepository(
-                                csrfRepository
-                        )
+                        .csrfTokenRepository(csrfRepository)
                         .ignoringRequestMatchers(
-                                "/internal/**"
+                                "/internal/**",
+                                "/usuarios/login",
+                                "/usuarios/logout",
+                                "/usuarios"
                         )
                 )
 
