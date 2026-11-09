@@ -24,11 +24,21 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @org.springframework.beans.factory.annotation.Value("${app.cors.allowed-origins}")
+
+    private String[] allowedOrigins;
     private final JwtFilter jwtFilter;
     private final InternalApiKeyFilter internalApiKeyFilter;
     private final CookieSecurityProperties cookieProperties;
 
+
+
+
     public SecurityConfig(
+
+
+
+
             JwtFilter jwtFilter,
             InternalApiKeyFilter internalApiKeyFilter,
             CookieSecurityProperties cookieProperties) {
@@ -230,10 +240,15 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // Coloque aqui a URL exata do seu Front-end
-        configuration.setAllowedOrigins(List.of(
+
+        configuration.setAllowedOrigins(List.of(allowedOrigins));
+
+        /*configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "https://horti-control-front-end.vercel.app" // <--- ADICIONE AQUI A URL DO SEU FRONTEND NO VERCEL
         ));
+         */
+
         // Métodos HTTP permitidos
         configuration.setAllowedMethods(
                 List.of("GET", "POST", "PUT", "DELETE","PATCH", "OPTIONS")
