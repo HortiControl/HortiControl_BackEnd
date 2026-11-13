@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import sptech.horticontrol.dtos.response.PedidoResponseDTO;
+import sptech.horticontrol.dto.response.PedidoResponseDTO;
 import sptech.horticontrol.enums.EscopoPedidos;
 import sptech.horticontrol.service.PedidoService;
 

@@ -11,8 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sptech.horticontrol.dtos.request.ProdutoRequestDTO;
-import sptech.horticontrol.dtos.response.ProdutoResponseDTO;
+import sptech.horticontrol.dto.request.ProdutoRequestDTO;
+import sptech.horticontrol.dto.response.ProdutoResponseDTO;
 import sptech.horticontrol.service.ProdutoService;
 
 import java.math.BigDecimal;
