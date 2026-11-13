@@ -1,7 +1,7 @@
 package sptech.horticontrol.service.resultado;
 
 import org.springframework.stereotype.Component;
-import sptech.horticontrol.dtos.resultados.EmbalagemDataDTO;
+import sptech.horticontrol.dto.resultados.EmbalagemDataDTO;
 import sptech.horticontrol.entity.Pedido;
 import sptech.horticontrol.enums.TipoEmbalagem;
 

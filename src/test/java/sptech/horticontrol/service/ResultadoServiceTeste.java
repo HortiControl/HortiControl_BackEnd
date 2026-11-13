@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import sptech.horticontrol.dtos.resultados.ResultadosResponseDTO;
+import sptech.horticontrol.dto.resultados.ResultadosResponseDTO;
 import sptech.horticontrol.entity.ItemPedido;
 import sptech.horticontrol.entity.Mercado;
 import sptech.horticontrol.entity.Pedido;

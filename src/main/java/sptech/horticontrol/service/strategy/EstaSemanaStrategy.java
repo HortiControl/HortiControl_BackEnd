@@ -1,7 +1,7 @@
 package sptech.horticontrol.service.strategy;
 
-import sptech.horticontrol.dtos.resultados.ChartDataDTO;
-import sptech.horticontrol.dtos.resultados.IntervaloDatas;
+import sptech.horticontrol.dto.resultados.ChartDataDTO;
+import sptech.horticontrol.dto.resultados.IntervaloDatas;
 import sptech.horticontrol.entity.Pedido;
 
 import java.math.BigDecimal;

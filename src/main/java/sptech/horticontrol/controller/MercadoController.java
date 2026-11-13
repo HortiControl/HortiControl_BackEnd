@@ -13,8 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sptech.horticontrol.dtos.request.MercadoRequestDTO;
-import sptech.horticontrol.dtos.response.MercadoResponseDTO;
+import sptech.horticontrol.dto.request.MercadoRequestDTO;
+import sptech.horticontrol.dto.response.MercadoResponseDTO;
 import sptech.horticontrol.service.MercadoService;
 
 

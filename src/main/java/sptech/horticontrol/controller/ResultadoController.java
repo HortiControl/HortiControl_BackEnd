@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import sptech.horticontrol.dtos.resultados.ResultadosResponseDTO;
+import sptech.horticontrol.dto.resultados.ResultadosResponseDTO;
 import sptech.horticontrol.service.ResultadoService;
 
 @RestController

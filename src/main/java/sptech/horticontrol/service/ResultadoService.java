@@ -1,7 +1,7 @@
 package sptech.horticontrol.service;
 
 import org.springframework.stereotype.Service;
-import sptech.horticontrol.dtos.resultados.*;
+import sptech.horticontrol.dto.resultados.*;
 import sptech.horticontrol.entity.Pedido;
 import sptech.horticontrol.repository.PedidoRepository;
 import sptech.horticontrol.service.resultado.EmbalagemCalculator;

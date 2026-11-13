@@ -13,8 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import sptech.horticontrol.dtos.request.PedidoRequestDTO;
-import sptech.horticontrol.dtos.response.PedidoResponseDTO;
+import sptech.horticontrol.dto.request.PedidoRequestDTO;
+import sptech.horticontrol.dto.response.PedidoResponseDTO;
 import sptech.horticontrol.enums.StatusPedido;
 import sptech.horticontrol.service.PedidoService;
 

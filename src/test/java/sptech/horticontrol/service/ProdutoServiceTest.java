@@ -9,13 +9,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import sptech.horticontrol.dtos.request.ProdutoRequestDTO;
-import sptech.horticontrol.dtos.response.ProdutoResponseDTO;
+import sptech.horticontrol.dto.request.ProdutoRequestDTO;
+import sptech.horticontrol.dto.response.ProdutoResponseDTO;
 import sptech.horticontrol.entity.Produto;
 import sptech.horticontrol.enums.TipoEmbalagem;
 import sptech.horticontrol.enums.TipoProduto;
-import sptech.horticontrol.exceptions.RecursoNaoEncontradoException;
-import sptech.horticontrol.exceptions.RegraNegocioException;
+import sptech.horticontrol.exception.RecursoNaoEncontradoException;
+import sptech.horticontrol.exception.RegraNegocioException;
 import sptech.horticontrol.repository.ProdutoRepository;
 
 import java.math.BigDecimal;

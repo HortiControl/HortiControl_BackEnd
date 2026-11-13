@@ -1,7 +1,7 @@
 package sptech.horticontrol.service.resultado;
 
 import org.springframework.stereotype.Component;
-import sptech.horticontrol.dtos.resultados.RankingClienteDTO;
+import sptech.horticontrol.dto.resultados.RankingClienteDTO;
 import sptech.horticontrol.entity.Pedido;
 
 import java.math.BigDecimal;

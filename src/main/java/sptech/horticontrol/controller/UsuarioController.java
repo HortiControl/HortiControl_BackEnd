@@ -10,9 +10,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import sptech.horticontrol.dtos.request.UsuarioPerfilRequestDTO;
-import sptech.horticontrol.dtos.request.UsuarioSenhaRequestDTO;
-import sptech.horticontrol.dtos.response.UsuarioResponseDTO;
+import sptech.horticontrol.dto.request.UsuarioPerfilRequestDTO;
+import sptech.horticontrol.dto.request.UsuarioSenhaRequestDTO;
+import sptech.horticontrol.dto.response.UsuarioResponseDTO;
 import sptech.horticontrol.entity.Usuario;
 import sptech.horticontrol.service.UsuarioService;
 

@@ -1,7 +1,7 @@
 package sptech.horticontrol.service.resultado;
 
 import org.springframework.stereotype.Component;
-import sptech.horticontrol.dtos.resultados.RankingProdutoDTO;
+import sptech.horticontrol.dto.resultados.RankingProdutoDTO;
 import sptech.horticontrol.entity.ItemPedido;
 import sptech.horticontrol.entity.Pedido;
 

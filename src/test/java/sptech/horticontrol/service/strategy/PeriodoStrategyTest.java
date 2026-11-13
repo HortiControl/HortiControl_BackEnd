@@ -1,8 +1,8 @@
 package sptech.horticontrol.service.strategy;
 
 import org.junit.jupiter.api.Test;
-import sptech.horticontrol.dtos.resultados.ChartDataDTO;
-import sptech.horticontrol.dtos.resultados.IntervaloDatas;
+import sptech.horticontrol.dto.resultados.ChartDataDTO;
+import sptech.horticontrol.dto.resultados.IntervaloDatas;
 import sptech.horticontrol.entity.Mercado;
 import sptech.horticontrol.entity.Pedido;
 

@@ -1,7 +1,7 @@
 package sptech.horticontrol.service.resultado;
 
 import org.springframework.stereotype.Component;
-import sptech.horticontrol.dtos.resultados.HistoricoEmbalagemDTO;
+import sptech.horticontrol.dto.resultados.HistoricoEmbalagemDTO;
 import sptech.horticontrol.entity.Pedido;
 import sptech.horticontrol.enums.TipoEmbalagem;
 import sptech.horticontrol.service.strategy.PeriodoHelper;

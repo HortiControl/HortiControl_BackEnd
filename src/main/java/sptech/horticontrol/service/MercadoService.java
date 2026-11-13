@@ -1,13 +1,13 @@
 package sptech.horticontrol.service;
 
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import sptech.horticontrol.dtos.request.MercadoRequestDTO;
-import sptech.horticontrol.dtos.response.MercadoResponseDTO;
+import sptech.horticontrol.dto.request.MercadoRequestDTO;
+import sptech.horticontrol.dto.response.MercadoResponseDTO;
 import sptech.horticontrol.entity.Mercado;
-import sptech.horticontrol.enums.TipoMercado;
-import sptech.horticontrol.exceptions.RecursoNaoEncontradoException;
+import sptech.horticontrol.exception.RecursoNaoEncontradoException;
 import sptech.horticontrol.repository.MercadoRepository;
 
 
@@ -15,11 +15,14 @@ import sptech.horticontrol.repository.MercadoRepository;
 public class MercadoService {
 
     private final MercadoRepository mercadoRepository;
+    private final MercadoLeituraCache mercadoLeituraCache;
 
-    public MercadoService(MercadoRepository mercadoRepository) {
+    public MercadoService(MercadoRepository mercadoRepository, MercadoLeituraCache mercadoLeituraCache) {
         this.mercadoRepository = mercadoRepository;
+        this.mercadoLeituraCache = mercadoLeituraCache;
     }
 
+    @CacheEvict(cacheNames = MercadoLeituraCache.CACHE, allEntries = true)
     public MercadoResponseDTO criarMercado(MercadoRequestDTO dto) {
 
         Mercado novoMercado = new Mercado();
@@ -33,20 +36,18 @@ public class MercadoService {
     }
 
     public Page<MercadoResponseDTO> listarMercados(Pageable pageable) {
-        return mercadoRepository.findAll(pageable)
-                .map(this::converterParaResponse);
+        return mercadoLeituraCache.listarTodos(pageable).paraPage(pageable);
     }
 
     public Page<MercadoResponseDTO> mercadosConsignados(Pageable pageable) {
-        return mercadoRepository.findByTipoMercado(TipoMercado.CONSIGNADO, pageable)
-                .map(this::converterParaResponse);
+        return mercadoLeituraCache.listarConsignados(pageable).paraPage(pageable);
     }
 
     public Page<MercadoResponseDTO> mercadosNormais(Pageable pageable) {
-        return mercadoRepository.findByTipoMercado(TipoMercado.NORMAL, pageable)
-                .map(this::converterParaResponse);
+        return mercadoLeituraCache.listarNormais(pageable).paraPage(pageable);
     }
 
+    @CacheEvict(cacheNames = MercadoLeituraCache.CACHE, allEntries = true)
     public MercadoResponseDTO atualizarMercado(Long id, MercadoRequestDTO dto) {
 
         Mercado mercadoExistente = mercadoRepository.findById(id)
@@ -61,6 +62,7 @@ public class MercadoService {
         return converterParaResponse(atualizado);
     }
 
+    @CacheEvict(cacheNames = MercadoLeituraCache.CACHE, allEntries = true)
     public void excluirMercado(Long id) {
         if (!mercadoRepository.existsById(id)) {
             throw new RecursoNaoEncontradoException("Mercado não encontrado");
@@ -68,7 +70,7 @@ public class MercadoService {
         mercadoRepository.deleteById(id);
     }
 
-    private MercadoResponseDTO converterParaResponse(Mercado m) {
+    static MercadoResponseDTO converterParaResponse(Mercado m) {
         return new MercadoResponseDTO(
                 m.getId(),
                 m.getNome(),

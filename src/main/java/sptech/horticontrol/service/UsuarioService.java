@@ -2,12 +2,12 @@ package sptech.horticontrol.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import sptech.horticontrol.dtos.request.UsuarioPerfilRequestDTO;
-import sptech.horticontrol.dtos.request.UsuarioSenhaRequestDTO;
-import sptech.horticontrol.dtos.response.UsuarioResponseDTO;
+import sptech.horticontrol.dto.request.UsuarioPerfilRequestDTO;
+import sptech.horticontrol.dto.request.UsuarioSenhaRequestDTO;
+import sptech.horticontrol.dto.response.UsuarioResponseDTO;
 import sptech.horticontrol.entity.Usuario;
-import sptech.horticontrol.exceptions.RecursoNaoEncontradoException;
-import sptech.horticontrol.exceptions.RegraNegocioException;
+import sptech.horticontrol.exception.RecursoNaoEncontradoException;
+import sptech.horticontrol.exception.RegraNegocioException;
 import sptech.horticontrol.repository.UsuarioRepository;
 
 import java.util.List;
